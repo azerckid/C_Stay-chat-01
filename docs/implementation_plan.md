@@ -56,7 +56,7 @@
 ### Step 7: Prisma 설치 및 libSQL 어댑터 초기화
 - **작업**: `prisma`, `@prisma/client`, `@libsql/client` 설치 및 초기화.
 - **검증 목록**:
-    - [ ] `prisma/schema.prisma` 파일이 생성되었는가?
+    - [x] `prisma/schema.prisma` 파일이 생성되었는가?
 - **Git 커밋**: `feat(db): Prisma 및 libSQL 클라이언트 라이브러리 설치`
 
 ### Step 8: 데이터베이스 모델링(Schema) 작성
