@@ -40,7 +40,7 @@
 ### Step 5: 기초 레이아웃 및 공용(Shared) 구조 확립
 - **작업**: `components/layout`, `lib/utils`, `routes`, `hooks` 폴더 생성 및 **`app/shared/schemas`** 폴더를 생성하여 서버/클라이언트 공용 Zod 스키마 배치 기반 마련.
 - **검증 목록**:
-    - [ ] 모든 기본 폴더가 생성되고 `shared` 구조가 포함되었는가?
+    - [x] 모든 기본 폴더가 생성되고 `shared` 구조가 포함되었는가?
 - **Git 커밋**: `chore(base): 프로젝트 폴더 구조 및 공용 스키마 뼈대 생성`
 
 ### Step 6: 폰트 및 에셋 인프라 구축
