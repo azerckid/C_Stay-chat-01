@@ -26,8 +26,8 @@
 ### Step 3: Tailwind CSS v4 상세 테마 및 다크모드 시스템 설정
 - **작업**: `UI_DESIGN_SYSTEM.md`의 컬러 팔레트 정의 및 Tailwind v4 `@theme` 블록 설정. 시스템 설정과 무관하게 **Dark Mode를 강제(class 전략)**하여 Deep Night Blue 테마 고정.
 - **검증 목록**:
-    - [ ] `@theme` 블록에 커스텀 컬러 및 `blur-premium` 상수가 정의되었는가?
-    - [ ] `<html>` 태그에 `dark` 클래스가 적용되어 테마가 고정되는가?
+    - [x] `@theme` 블록에 커스텀 컬러 및 `blur-premium` 상수가 정의되었는가?
+    - [x] `<html>` 태그에 `dark` 클래스가 적용되어 테마가 고정되는가?
 - **Git 커밋**: `style(design): Tailwind v4 프리미엄 다크 테마 시스템 구축`
 
 ### Step 4: 환경 변수(.env) 정비 및 유효성 검사
