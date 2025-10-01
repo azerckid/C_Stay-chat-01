@@ -11,15 +11,16 @@
 ### Step 1: shadcn/ui Nova 프리셋을 이용한 프로젝트 생성
 - **작업**: `STAYnC-chat` 폴더 내부에서 `npx shadcn@latest create` 명령어로 Nova 스타일, Hugeicons, Inter 폰트 기반 Vite 프로젝트 생성.
 - **검증 목록**:
-    - [ ] 프로젝트 루트(`STAYnC-chat/`)에 `shadcn.json` 및 `tailwind.config.js`가 생성되었는가?
-    - [ ] `components/ui` 폴더에 기본 컴포넌트들이 생성되었는가?
+    - [x] 프로젝트 루트에 `components.json`(기존 shadcn.json)이 생성되었는가?
+    - [x] Tailwind v4 설정이 `vite.config.ts` 및 CSS에 통합되었는가?
+    - [x] `app/components/ui` 폴더에 기본 컴포넌트들이 생성되었는가?
 - **Git 커밋**: `feat(init): shadcn/ui Nova 프리셋 프로젝트 초기 생성`
 
 ### Step 2: React Router v7(Vite) 통합 설정
 - **작업**: 기존 Vite 설정을 `react-router` 패키지로 전환하고 `@react-router/dev/vite` 플러그인 설정.
 - **검증 목록**:
-    - [ ] `vite.config.ts`에 `reactRouter()` 플러그인이 포함되었는가?
-    - [ ] `app/root.tsx` 파일이 생성되고 기본 라우팅이 작동하는가?
+    - [x] `vite.config.ts`에 `reactRouter()` 플러그인이 포함되었는가?
+    - [x] `app/root.tsx` 파일이 생성되고 기본 라우팅이 작동하는가?
 - **Git 커밋**: `feat(router): React Router v7 프레임워크 통합`
 
 ### Step 3: Tailwind CSS v4 상세 테마 및 다크모드 시스템 설정
