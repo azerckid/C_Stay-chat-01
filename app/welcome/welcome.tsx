@@ -3,7 +3,7 @@ import logoDark from "./logo-dark.svg";
 
 export function Welcome() {
   return (
-    <SafeArea className="justify-center p-6 overflow-hidden relative">
+    <SafeArea className="items-center justify-center p-6 overflow-hidden relative">
       {/* Decorative Blur Orbs */}
       <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-neon-blue/20 rounded-full blur-[120px] animate-pulse" />
       <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-neon-purple/20 rounded-full blur-[120px] animate-pulse" />
