@@ -94,7 +94,7 @@
 ## Phase 3: 디자인 시스템 및 루트 레이아웃 (Step 13-18)
 
 ### Step 13: 글로벌 글래스모피즘(Glassmorphism) CSS 정의
-- **검증 목록**: [ ] `.glass-card` 등 효과가 디자인 가이드와 일치하는가?
+- **검증 목록**: [x] `.glass-card` 등 효과가 디자인 가이드와 일치하는가?
 - **Git 커밋**: `style(design): 글로벌 글래스모피즘 스타일 정의`
 
 ### Step 14: Safe Area 컨테이너 컴포넌트 구축
