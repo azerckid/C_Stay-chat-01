@@ -80,7 +80,7 @@
 ### Step 11: Zod 기반 공용 데이터 검증 객체 정의
 - **작업**: `app/shared/schemas` 내에 API 요청/응답 및 DB 엔티티를 위한 Zod 스키마 작성. 클라이언트와 서버에서 동일한 스키마를 사용하여 Type Safety 보장.
 - **검증 목록**:
-    - [ ] 모든 핵심 데이터 모델(User, Room, Message)에 대응하는 Zod 스키마가 존재하는가?
+    - [x] 모든 핵심 데이터 모델(User, Room, Message)에 대응하는 Zod 스키마가 존재하는가?
 - **Git 커밋**: `feat(validation): Zod를 이용한 전역 타입 안전 데이터 검증 체계 구축`
 
 ### Step 12: DB Seed 데이터 주입
