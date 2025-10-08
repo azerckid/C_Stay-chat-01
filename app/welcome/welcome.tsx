@@ -1,22 +1,16 @@
-import { SafeArea } from "../components/layout";
+import { SafeArea, AppHeader } from "../components/layout";
 import logoDark from "./logo-dark.svg";
 
 export function Welcome() {
   return (
     <SafeArea className="items-center justify-center p-6 overflow-hidden relative">
+      <AppHeader />
       {/* Decorative Blur Orbs */}
       <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-neon-blue/20 rounded-full blur-[120px] animate-pulse" />
       <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-neon-purple/20 rounded-full blur-[120px] animate-pulse" />
 
-      <div className="z-10 w-full max-w-lg space-y-12 animate-spring-in">
+      <div className="z-10 w-full max-w-lg space-y-12 animate-spring-in pt-12">
         <header className="text-center space-y-4">
-          <div className="flex justify-center mb-6">
-            <img
-              src={logoDark}
-              alt="STAYnC"
-              className="h-16 w-auto drop-shadow-[0_0_15px_rgba(0,209,255,0.3)]"
-            />
-          </div>
           <h1 className="text-5xl font-bold font-sans tracking-tight text-glow-blue">
             Premium AI Chat
           </h1>
