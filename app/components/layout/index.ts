@@ -1,2 +1,1 @@
-// 레이아웃 컴포넌트들을 이곳에서 내보냅니다.
-export { };
+export * from "./safe-area";
