@@ -8,3 +8,94 @@ generator client {
 datasource db {
   provider = "sqlite"
 }
+
+// 2.1 User (사용자)
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  name      String
+  avatarUrl String?
+  status    String   @default("OFFLINE") // ONLINE, OFFLINE, AWAY
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  roomMemberAs RoomMember[]
+  messages     Message[]
+  todos        Todo[]
+
+  @@index([email])
+}
+
+// 2.2 Room (채팅방)
+model Room {
+  id        String   @id @default(uuid())
+  name      String?
+  type      String   @default("DIRECT") // DIRECT, GROUP
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  members  RoomMember[]
+  messages Message[]
+}
+
+// 2.3 RoomMember (방 멤버)
+model RoomMember {
+  id       String   @id @default(uuid())
+  userId   String
+  roomId   String
+  role     String   @default("MEMBER") // OWNER, ADMIN, MEMBER
+  joinedAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  room Room @relation(fields: [roomId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([roomId])
+}
+
+// 2.4 Message (메시지)
+model Message {
+  id        String   @id @default(uuid())
+  content   String
+  type      String   @default("TEXT") // TEXT, IMAGE, FILE, SYSTEM, AI_RESPONSE
+  senderId  String
+  roomId    String
+  createdAt DateTime @default(now())
+
+  sender User @relation(fields: [senderId], references: [id], onDelete: Cascade)
+  room   Room @relation(fields: [roomId], references: [id], onDelete: Cascade)
+
+  agentExecutions AgentExecution[]
+
+  @@index([roomId, createdAt])
+}
+
+// 2.5 AgentExecution (에이전트 실행 기록)
+model AgentExecution {
+  id               String   @id @default(uuid())
+  messageId        String
+  agentName        String // Orchestrator, Concierge 등
+  intent           String // 사용자 의도 분석 결과
+  promptTokens     Int      @default(0)
+  completionTokens Int      @default(0)
+  totalTokens      Int      @default(0)
+  rawOutput        String? // JSON data
+  createdAt        DateTime @default(now())
+
+  message Message @relation(fields: [messageId], references: [id], onDelete: Cascade)
+}
+
+// 2.6 Todo (개인 비서용 할 일)
+model Todo {
+  id          String    @id @default(uuid())
+  userId      String
+  title       String
+  description String?
+  status      String    @default("PENDING") // PENDING, COMPLETED, CANCELLED
+  dueDate     DateTime?
+  createdAt   DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}

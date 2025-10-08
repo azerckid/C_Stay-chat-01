@@ -62,7 +62,7 @@
 ### Step 8: 데이터베이스 모델링(Schema) 작성
 - **작업**: `DATABASE_SCHEMA.md`를 바탕으로 스키마 작성.
 - **검증 목록**:
-    - [ ] User, Room, Message 모델이 스키마 파일에 정확히 정의되었는가?
+    - [x] User, Room, Message 모델이 스키마 파일에 정확히 정의되었는가?
 - **Git 커밋**: `feat(db): 채팅 서비스 핵심 데이터 스키마 정의`
 
 ### Step 9: Turso DB 연결 및 Prisma Client 생성
