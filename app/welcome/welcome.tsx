@@ -1,4 +1,4 @@
-import { SafeArea, AppHeader } from "../components/layout";
+import { SafeArea, AppHeader, BottomNav } from "../components/layout";
 import logoDark from "./logo-dark.svg";
 
 export function Welcome() {
@@ -52,6 +52,7 @@ export function Welcome() {
           </div>
         </footer>
       </div>
+      <BottomNav />
     </SafeArea>
   );
 }
