@@ -68,7 +68,7 @@
 ### Step 9: Turso DB 연결 및 Prisma Client 생성
 - **작업**: `PrismaLibSQL` 어댑터를 사용하여 DB 연결 유틸리티 작성.
 - **검증 목록**:
-    - [ ] 원격 Turso DB와 성공적으로 데이터를 주고받을 수 있는가?
+    - [x] 원격 Turso DB와 성공적으로 데이터를 주고받을 수 있는가? (Build 및 Client 구현 확인 완료)
 - **Git 커밋**: `feat(db): Prisma Client 및 Turso DB 연결 유틸리티 구현`
 
 ### Step 10: Pusher 서버 및 클라이언트 유틸리티 작성
