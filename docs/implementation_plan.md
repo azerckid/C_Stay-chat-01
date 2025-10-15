@@ -112,7 +112,7 @@
 ### Step 17: 라우트 전환 애니메이션 및 SSR 최적화
 - **작업**: RRv7 `Outlet`과 Framer Motion을 결합하여 페이지 이동 시 부드러운 전환 효과 구현. SSR 환경에서 하이드레이션 오류가 없도록 애니메이션 컴포넌트 최적화.
 - **검증 목록**:
-    - [ ] 페이지 이동 시 Slide-with-Fade 전환 효과가 매끄럽게 나타나는가?
+    - [x] 페이지 이동 시 Slide-with-Fade 전환 효과가 매끄럽게 나타나는가? (Framer Motion 통합 완료)
 - **Git 커밋**: `feat(ui): Framer Motion & RRv7 기반 페이지 전환 시스템 구현`
 
 ### Step 18: 프리미엄 로딩, Skeleton UI 및 스플래시 화면

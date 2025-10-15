@@ -12,6 +12,8 @@ import "@fontsource-variable/outfit";
 import "@fontsource-variable/inter";
 import "./app.css";
 
+import { PageTransition } from "./components/layout";
+
 export const links: Route.LinksFunction = () => [];
 
 export function Layout({ children }: { children: React.ReactNode }) {
@@ -19,11 +21,11 @@ export function Layout({ children }: { children: React.ReactNode }) {
     <html lang="en" suppressHydrationWarning>
       <head>
         <meta charSet="utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
         <Meta />
         <Links />
       </head>
-      <body>
+      <body className="bg-background min-h-screen">
         <ThemeProvider
           attribute="class"
           defaultTheme="dark"
@@ -41,7 +43,11 @@ export function Layout({ children }: { children: React.ReactNode }) {
 }
 
 export default function App() {
-  return <Outlet />;
+  return (
+    <PageTransition>
+      <Outlet />
+    </PageTransition>
+  );
 }
 
 export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
