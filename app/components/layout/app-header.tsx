@@ -4,6 +4,7 @@ import logoDark from "~/welcome/logo-dark.svg";
 interface AppHeaderProps extends React.HTMLAttributes<HTMLElement> {
     title?: string;
     showLogo?: boolean;
+    showStatus?: boolean;
 }
 
 /**
@@ -13,6 +14,7 @@ interface AppHeaderProps extends React.HTMLAttributes<HTMLElement> {
 export function AppHeader({
     title,
     showLogo = true,
+    showStatus = true,
     className,
     ...props
 }: AppHeaderProps) {
@@ -42,10 +44,12 @@ export function AppHeader({
 
             <div className="flex items-center gap-3">
                 {/* 헤더 우측 유틸리티 공간 (예: 프로필, 알림 등) */}
-                <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 border border-white/10">
-                    <div className="w-1.5 h-1.5 rounded-full bg-neon-green animate-pulse" />
-                    <span className="text-[10px] font-bold uppercase tracking-widest text-white/50">Online</span>
-                </div>
+                {showStatus && (
+                    <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 border border-white/10">
+                        <div className="w-1.5 h-1.5 rounded-full bg-neon-green animate-pulse" />
+                        <span className="text-[10px] font-bold uppercase tracking-widest text-white/50">Online</span>
+                    </div>
+                )}
             </div>
         </header>
     );
