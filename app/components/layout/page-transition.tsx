@@ -14,15 +14,15 @@ export function PageTransition({ children }: PageTransitionProps) {
     const location = useLocation();
 
     return (
-        <AnimatePresence mode="wait" initial={false}>
+        <AnimatePresence mode="popLayout" initial={false}>
             <motion.div
                 key={location.pathname}
-                initial={{ opacity: 0, y: 12 }}
+                initial={{ opacity: 0, y: 40 }}
                 animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -12 }}
+                exit={{ opacity: 0, y: -40 }}
                 transition={{
-                    duration: 0.3,
-                    ease: [0.33, 1, 0.68, 1] // 부드러운 프리미엄 가속도
+                    duration: 0.6,
+                    ease: [0.16, 1, 0.3, 1] // 부드러운 Ease-Out
                 }}
                 className="flex-1 w-full flex flex-col"
             >
