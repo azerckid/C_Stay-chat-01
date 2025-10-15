@@ -11,19 +11,69 @@ datasource db {
 
 // 2.1 User (사용자)
 model User {
-  id        String   @id @default(uuid())
-  email     String   @unique
-  name      String
-  avatarUrl String?
-  status    String   @default("OFFLINE") // ONLINE, OFFLINE, AWAY
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id            String   @id
+  email         String   @unique
+  name          String
+  emailVerified Boolean  @default(false)
+  image         String? // Better Auth 전용
+  avatarUrl     String? // STAYnC 전용 (image와 동기화 가능)
+  status        String   @default("OFFLINE") // ONLINE, OFFLINE, AWAY
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 
+  sessions     Session[]
+  accounts     Account[]
   roomMemberAs RoomMember[]
   messages     Message[]
   todos        Todo[]
 
   @@index([email])
+  @@map("user")
+}
+
+model Session {
+  id        String   @id
+  expiresAt DateTime
+  token     String
+  createdAt DateTime
+  updatedAt DateTime
+  ipAddress String?
+  userAgent String?
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([token])
+  @@map("session")
+}
+
+model Account {
+  id                    String    @id
+  accountId             String
+  providerId            String
+  userId                String
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime
+  updatedAt             DateTime
+
+  @@map("account")
+}
+
+model Verification {
+  id         String    @id
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime?
+  updatedAt  DateTime?
+
+  @@map("verification")
 }
 
 // 2.2 Room (채팅방)

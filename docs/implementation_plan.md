@@ -128,8 +128,8 @@
 ### Step 19: 소셜 로그인(Google/Kakao) 구조 설계
 - **작업**: Better Auth 혹은 Auth.js 설정 및 Prisma 어댑터 연동. Google/Kakao Developer Console 앱 등록 기초 가이드 수립.
 - **검증 목록**:
-    - [ ] `Account`, `Session` 테이블이 DB에 올바르게 생성되었는가?
-    - [ ] 환경 변수(`AUTH_SECRET` 등)가 보안 가이드를 준수하는가?
+    - [x] `Account`, `Session` 테이블이 DB에 올바르게 생성되었는가? (Prisma schema 업데이트 및 push 완료)
+    - [x] 환경 변수(`AUTH_SECRET` 등)가 보안 가이드를 준수하는가? (기본 설정 및 API 핸들러 구현 완료)
 - **Git 커밋**: `chore(auth): 인증 시스템 엔진 설치 및 DB 스키마 연동`
 
 ### Step 20: 인증 페이지(Login/Signup) 프리미엄 UI
