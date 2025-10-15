@@ -11,8 +11,8 @@ import { ThemeProvider } from "./components/theme-provider";
 import "@fontsource-variable/outfit";
 import "@fontsource-variable/inter";
 import "./app.css";
-
-import { PageTransition } from "./components/layout";
+import { PageTransition, LoadingBar, SplashScreen } from "./components/layout";
+import { useState, useEffect } from "react";
 
 export const links: Route.LinksFunction = () => [];
 
@@ -33,6 +33,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
           enableSystem={false}
           disableTransitionOnChange
         >
+          <LoadingBar />
           {children}
         </ThemeProvider>
         <ScrollRestoration />
@@ -43,10 +44,17 @@ export function Layout({ children }: { children: React.ReactNode }) {
 }
 
 export default function App() {
+  const [showSplash, setShowSplash] = useState(true);
+
   return (
-    <PageTransition>
-      <Outlet />
-    </PageTransition>
+    <>
+      <SplashScreen onFinish={() => setShowSplash(false)} />
+      {!showSplash && (
+        <PageTransition>
+          <Outlet />
+        </PageTransition>
+      )}
+    </>
   );
 }
 

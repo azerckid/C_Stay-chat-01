@@ -118,7 +118,7 @@
 ### Step 18: 프리미엄 로딩, Skeleton UI 및 스플래시 화면
 - **작업**: 초기 진입 스플래시와 더불어, RRv7 `useNavigation` 상태를 활용한 글로벌 로딩 바 및 주요 섹션용 Skeleton UI 적용.
 - **검증 목록**:
-    - [ ] 데이터 로딩 중 스켈레톤 UI가 출력되어 시각적 불안정성이 제거되었는가?
+    - [x] 데이터 로딩 중 스켈레톤 UI가 출력되어 시각적 불안정성이 제거되었는가? (SplashScreen, LoadingBar, Shimmer Skeleton 구현 완료)
 - **Git 커밋**: `feat(ui): 앱 스플래시 및 Skeleton 로딩 시스템 구현`
 
 ---
