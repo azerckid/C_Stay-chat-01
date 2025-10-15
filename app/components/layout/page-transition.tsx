@@ -17,14 +17,15 @@ export function PageTransition({ children }: PageTransitionProps) {
         <AnimatePresence mode="popLayout" initial={false}>
             <motion.div
                 key={location.pathname}
-                initial={{ opacity: 0, y: 40 }}
+                initial={{ opacity: 0, y: 150 }}
                 animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -40 }}
+                exit={{ opacity: 0, y: -150 }}
                 transition={{
-                    duration: 0.6,
-                    ease: [0.16, 1, 0.3, 1] // 부드러운 Ease-Out
+                    duration: 1.6,
+                    ease: [0.19, 1, 0.22, 1] // 더욱 웅장하고 부드러운 Ease-Out
                 }}
-                className="flex-1 w-full flex flex-col"
+                style={{ width: "100%" }}
+                className="flex-1 flex flex-col"
             >
                 {children}
             </motion.div>
