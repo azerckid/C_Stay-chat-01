@@ -3,26 +3,33 @@ import { prismaAdapter } from "better-auth/adapters/prisma";
 import { prisma } from "./db.server";
 
 /**
- * Better Auth 설정
- * Prisma 어댑터를 사용하여 데이터베이스 세션을 관리합니다.
+ * STAYnC 인증 엔진 (AUTH_PLAN.md 준수)
+ * 리다이렉트 경로는 플랜에 정의된 대로 고정합니다.
  */
 export const auth = betterAuth({
     database: prismaAdapter(prisma, {
-        provider: "sqlite", // Turso는 SQLite와 호환됩니다.
+        provider: "sqlite",
     }),
+    // 플랜의 2.1 항목에 따라 /auth 경로를 기본으로 사용합니다.
+    advanced: {
+        basePath: "/auth",
+    },
     socialProviders: {
         google: {
             clientId: process.env.GOOGLE_CLIENT_ID || "",
             clientSecret: process.env.GOOGLE_CLIENT_SECRET || "",
+            // AUTH_PLAN.md 2.1.2 정의 준수
+            redirectURI: "http://localhost:5173/auth/google/callback",
         },
         kakao: {
             clientId: process.env.KAKAO_CLIENT_ID || "",
             clientSecret: process.env.KAKAO_CLIENT_SECRET || "",
+            // AUTH_PLAN.md 2.1.2 정의 준수
+            redirectURI: "http://localhost:5173/auth/kakao/callback",
         },
     },
-    // 세션 설정 (필요 시 수정)
     session: {
-        expiresIn: 60 * 60 * 24 * 7, // 7일
-        updateAge: 60 * 60 * 24, // 1일마다 세션 갱신
+        expiresIn: 60 * 60 * 24 * 7,
+        updateAge: 60 * 60 * 24,
     },
 });

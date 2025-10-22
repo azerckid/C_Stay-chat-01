@@ -1,9 +1,12 @@
 import { createAuthClient } from "better-auth/react";
 
 /**
- * 프론트엔드에서 인증 기능을 사용하기 위한 클라이언트입니다.
- * 소셜 로그인 요청 및 세션 확인 기능을 제공합니다.
+ * STAYnC 인증 클라이언트
+ * AUTH_PLAN.md에 따라 baseURL을 /auth로 명시하여 모든 세션/로그인 요청이 
+ * 우리 라우터의 /auth/* 경로로 명중하게 합니다.
  */
 export const authClient = createAuthClient({
-    baseURL: typeof window !== "undefined" ? window.location.origin : "http://localhost:5173",
+    baseURL: typeof window !== "undefined"
+        ? `${window.location.origin}/auth`
+        : "http://localhost:5173/auth",
 });
