@@ -162,8 +162,52 @@
 
 ---
 
-## Phase 5: 대화 목록 및 메시징 인프라 (Step 24-28)
-(대화 목록 구현, Presence 채널, 스와이프 액션 등)
+## Phase 5: 대화 목록 및 메시징(실시간 기능)
+> **목표**: 사용자와 AI 컨시어지 간의 실시간 대화 시스템 구축 (Pusher 기반)
+
+### Step 24: 채팅방 API 구현 (Chat Room API)
+- **작업**:
+    - `app/routes/api.rooms.ts`: 채팅방 목록 조회(GET) 및 생성(POST)
+    - `app/routes/api.messages.ts`: 메시지 전송(POST)
+    - `app/routes/api.rooms.$roomId.messages.ts`: 메시지 내역 조회(GET)
+- **검증 목록**:
+    - [ ] `GET /api/rooms` 호출 시 정상적인 JSON 응답이 오는가?
+    - [ ] `POST /api/rooms` 호출 시 DB에 `Room` 및 `RoomMember`가 생성되는가?
+    - [ ] 생성된 채팅방 ID로 메시지를 조회했을 때 빈 배열이 정상 반환되는가?
+- **Git 커밋**: `feat(chat): 채팅방 관리 및 메시지 처리 API 엔드포인트 구현`
+
+### Step 25: 채팅방 UI 컴포넌트 개발 (Core UI)
+- **작업**:
+    - `app/components/chat/chat-list-item.tsx`: 목록 아이템 디자인
+    - `app/components/chat/message-bubble.tsx`: 말풍선 디자인 (Me/Other/System 구분)
+    - `app/components/chat/chat-window.tsx`: 메시지 목록 컨테이너
+    - `app/components/chat/chat-input.tsx`: 입력창 (Auto-resize)
+- **검증 목록**:
+    - [ ] `ChatListItem`이 더미 데이터를 받아 정상 렌더링되는가?
+    - [ ] `MessageBubble`이 senderId에 따라 좌/우 정렬이 올바르게 되는가?
+    - [ ] `ChatInput`에서 텍스트 입력 및 전송 이벤트가 발생하는가?
+- **Git 커밋**: `feat(ui): 채팅방 목록 및 대화창 핵심 UI 컴포넌트 구현`
+
+### Step 26: 채팅 페이지 통합 (Integration)
+- **작업**:
+    - `/chat` (index): `api.rooms` 호출하여 목록 렌더링
+    - `/chat/:roomId`: `api.messages` 호출하여 대화창 렌더링
+    - 라우트 설정 업데이트 (`routes.ts`)
+- **검증 목록**:
+    - [ ] `/chat` 접속 시 내 채팅방 목록이 보이는가?
+    - [ ] 목록 클릭 시 해당 채팅방 URL로 이동하는가?
+    - [ ] 채팅방 진입 시 이전 대화 내역이 불러와지는가?
+- **Git 커밋**: `feat(chat): 채팅방 목록 및 상세 화면 라우팅 연동`
+
+### Step 27: 실시간 메시징 연동 (Real-time with Pusher)
+- **작업**:
+    - `app/lib/pusher.ts` (Client) & `app/lib/pusher.server.ts` (Server) 설정
+    - 메시지 전송 API에 `pusher.trigger` 추가
+    - 클라이언트 `channel.bind`로 실시간 수신 대기
+- **검증 목록**:
+    - [ ] 브라우저 탭 2개를 띄우고 메시지 전송 시, 새로고침 없이 즉시 반영되는가?
+    - [ ] AI 답변 생성 이벤트가 실시간으로 수신되는가?
+- **Git 커밋**: `feat(realtime): Pusher 기반 실시간 메시지 동기화 구현`
 
 ---
 
