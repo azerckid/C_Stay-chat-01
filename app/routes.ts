@@ -4,6 +4,7 @@ export default [
     index("routes/home.tsx"),
     route("chat", "routes/chat.tsx"),
     route("login", "routes/login.tsx"),
+    route("profile", "routes/profile.tsx"),
 
     // [AUTH_PLAN.md 명세 준수] 물리적 파일 경로와 URL을 1:1로 매칭
     route("auth/google/callback", "routes/auth/google/callback.ts"),

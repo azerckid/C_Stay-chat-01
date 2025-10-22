@@ -5,6 +5,7 @@ interface AppHeaderProps extends React.HTMLAttributes<HTMLElement> {
     title?: string;
     showLogo?: boolean;
     showStatus?: boolean;
+    showBack?: boolean;
 }
 
 /**
@@ -15,6 +16,7 @@ export function AppHeader({
     title,
     showLogo = true,
     showStatus = true,
+    showBack = false, // 기본값 false
     className,
     ...props
 }: AppHeaderProps) {
