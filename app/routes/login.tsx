@@ -11,20 +11,27 @@ export default function LoginPage() {
     const handleLogin = async (provider: "google" | "kakao") => {
         setLoadingProvider(provider);
 
+        // 1. 사용자에게 피드백 먼저 제공
+        toast.success(`${provider} 로그인 페이지로 이동합니다...`);
+
         try {
+            // 2. 토스트를 1초간 보여주기 위해 강제 지연
+            await new Promise((resolve) => setTimeout(resolve, 1000));
+
             const { error } = await authClient.signIn.social({
                 provider,
-                callbackURL: "/", // 로그인 성공 시 이동할 경로
+                callbackURL: "/",
             });
 
             if (error) {
                 toast.error(`${provider} 로그인 중 오류가 발생했습니다.`);
                 console.error("Auth error:", error);
+                setLoadingProvider(null); // 에러 시 로딩 해제
             }
+            // 성공 시에는 어차피 리다이렉트되므로 로딩 유지
         } catch (err) {
             toast.error("인증 시스템에 연결할 수 없습니다.");
             console.error("System error:", err);
-        } finally {
             setLoadingProvider(null);
         }
     };

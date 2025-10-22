@@ -1,14 +1,23 @@
 import { auth } from "~/lib/auth";
-import type { Route } from "./+types/callback";
+import type { LoaderFunctionArgs, ActionFunctionArgs } from "react-router";
 
 /**
- * Kakao OAuth Callback Handler
- * AUTH_PLAN.md: http://localhost:5173/auth/kakao/callback
+ * [AUTH_PLAN.md 2.1 준수] Kakao Callback Receiver
  */
-export async function action({ request }: Route.ActionArgs) {
-    return auth.handler(request);
+export async function loader({ request }: LoaderFunctionArgs) {
+    const url = new URL(request.url); // 예: .../auth/kakao/callback?code=abc
+
+    // 🚨 핵심 수정: 카카오 경로 맵핑 /auth/kakao/callback -> /auth/callback/kakao
+    url.pathname = "/auth/callback/kakao";
+
+    const libRequest = new Request(url.toString(), {
+        method: request.method,
+        headers: request.headers,
+    });
+
+    return auth.handler(libRequest);
 }
 
-export async function loader({ request }: Route.LoaderArgs) {
+export async function action({ request }: ActionFunctionArgs) {
     return auth.handler(request);
 }

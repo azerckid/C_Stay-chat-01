@@ -1,14 +1,13 @@
 import { auth } from "~/lib/auth";
-import type { Route } from "./+types/$";
+import type { LoaderFunctionArgs, ActionFunctionArgs } from "react-router";
 
 /**
- * Generic Auth Handler (sign-in, sign-out, session, etc.)
- * Treated as /auth/*
+ * 일반 인증 요청 핸들러 (/auth/*)
  */
-export async function action({ request }: Route.ActionArgs) {
+export async function action({ request }: ActionFunctionArgs) {
     return auth.handler(request);
 }
 
-export async function loader({ request }: Route.LoaderArgs) {
+export async function loader({ request }: LoaderFunctionArgs) {
     return auth.handler(request);
 }

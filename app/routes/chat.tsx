@@ -1,15 +1,15 @@
 import { SafeArea, AppHeader, BottomNav } from "../components/layout";
 import { getSession, requireAuth } from "~/lib/auth.server";
-import type { Route } from "./+types/chat";
+import { type LoaderFunctionArgs, useLoaderData } from "react-router";
 
-export async function loader({ request }: Route.LoaderArgs) {
+export async function loader({ request }: LoaderFunctionArgs) {
     const session = await getSession(request);
     requireAuth(session, request);
     return { user: session?.user };
 }
 
-export default function ChatPage({ loaderData }: Route.ComponentProps) {
-    const { user } = loaderData;
+export default function ChatPage() {
+    const { user } = useLoaderData<typeof loader>();
     return (
         <SafeArea className="items-center justify-center p-6 bg-background overflow-hidden relative">
             <AppHeader title="Chat" />

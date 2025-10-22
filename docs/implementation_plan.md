@@ -140,10 +140,10 @@
 - **Git 커밋**: `feat(ui): 프리미엄 글래스모피즘 로그인 페이지 구현`
 
 ### Step 21: OAuth 리다이렉트 콜백 처리 로직
-- **작업**: RRv7 `loaders` 및 `actions`를 활용한 OAuth 리다이렉트 콜백 처리. 인증 성공 후 세션 생성 및 쿠키 발급.
+- **작업**: RRv7 `loaders` 및 `actions`를 활용한 OAuth 리다이렉트 콜백 처리. 인증 성공/실패 시 `sonner` Toast를 사용하여 사용자에게 명확한 피드백 제공.
 - **검증 목록**:
     - [x] 소셜 인증 성공 후 의도한 페이지(`/`)로 정확히 리다이렉트 되는가? (authClient.signIn.social 연동 완료)
-    - [x] 인증 실패 시 사용자에게 적절한 에러 메시지를 표시하는가? (Better Auth API 핸들러 및 토스트 알림 구현 완료)
+    - [x] 인증 실패 시 Toast(Sonner)로 명확한 에러 메시지가 표시되는가? (Login 페이지 구현 완료)
 - **Git 커밋**: `feat(auth): OAuth 리다이렉트 핸들러 및 세션 발급 구현`
 
 ### Step 22: 세션 가드(Protected Routes) 미들웨어

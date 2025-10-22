@@ -1,3 +1,4 @@
+
 import {
   isRouteErrorResponse,
   Links,
@@ -13,6 +14,7 @@ import "@fontsource-variable/inter";
 import "./app.css";
 import { PageTransition, LoadingBar, SplashScreen } from "./components/layout";
 import { useState, useEffect } from "react";
+import { Toaster } from "sonner";
 
 export const links: Route.LinksFunction = () => [];
 
@@ -34,6 +36,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
           disableTransitionOnChange
         >
           <LoadingBar />
+          <Toaster position="top-center" richColors theme="dark" />
           {children}
         </ThemeProvider>
         <ScrollRestoration />

@@ -3,29 +3,29 @@ import { prismaAdapter } from "better-auth/adapters/prisma";
 import { prisma } from "./db.server";
 
 /**
- * STAYnC 인증 엔진 (AUTH_PLAN.md 준수)
- * 리다이렉트 경로는 플랜에 정의된 대로 고정합니다.
+ * STAYnC 인증 엔진 (AUTH_PLAN.md & .env 준수)
  */
 export const auth = betterAuth({
     database: prismaAdapter(prisma, {
         provider: "sqlite",
     }),
-    // 플랜의 2.1 항목에 따라 /auth 경로를 기본으로 사용합니다.
+    // ✅ 위치 수정: basePath는 최상위 옵션입니다.
+    basePath: "/auth",
     advanced: {
-        basePath: "/auth",
+        // 필요한 경우 추가적인 고급 설정 (현재는 비워둠)
     },
     socialProviders: {
         google: {
             clientId: process.env.GOOGLE_CLIENT_ID || "",
             clientSecret: process.env.GOOGLE_CLIENT_SECRET || "",
-            // AUTH_PLAN.md 2.1.2 정의 준수
-            redirectURI: "http://localhost:5173/auth/google/callback",
+            // 구글 콘솔 및 설계도와 일치하는 Redirect URL
+            redirectURI: process.env.GOOGLE_REDIRECT_URL,
         },
         kakao: {
             clientId: process.env.KAKAO_CLIENT_ID || "",
             clientSecret: process.env.KAKAO_CLIENT_SECRET || "",
-            // AUTH_PLAN.md 2.1.2 정의 준수
-            redirectURI: "http://localhost:5173/auth/kakao/callback",
+            // 카카오 콘솔 및 설계도와 일치하는 Redirect URL
+            redirectURI: process.env.KAKAO_REDIRECT_URL,
         },
     },
     session: {
