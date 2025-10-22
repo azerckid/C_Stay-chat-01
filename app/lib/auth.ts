@@ -15,7 +15,10 @@ export const auth = betterAuth({
             clientId: process.env.GOOGLE_CLIENT_ID || "",
             clientSecret: process.env.GOOGLE_CLIENT_SECRET || "",
         },
-        // Kakao 등 타 소셜 로그인 추가 가능
+        kakao: {
+            clientId: process.env.KAKAO_CLIENT_ID || "",
+            clientSecret: process.env.KAKAO_CLIENT_SECRET || "",
+        },
     },
     // 세션 설정 (필요 시 수정)
     session: {

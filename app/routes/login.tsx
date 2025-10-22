@@ -2,17 +2,31 @@ import { motion } from "framer-motion";
 import { SafeArea, AppHeader } from "../components/layout";
 import { SocialButton } from "../components/auth/social-button";
 import { useState } from "react";
+import { authClient } from "~/lib/auth-client";
+import { toast } from "sonner";
 
 export default function LoginPage() {
     const [loadingProvider, setLoadingProvider] = useState<string | null>(null);
 
-    const handleLogin = (provider: "google" | "kakao") => {
+    const handleLogin = async (provider: "google" | "kakao") => {
         setLoadingProvider(provider);
-        // TODO: Better Auth 연동 로직 추가 (Step 21)
-        console.log(`${provider} login triggered`);
 
-        // 임시 로딩 시뮬레이션
-        setTimeout(() => setLoadingProvider(null), 2000);
+        try {
+            const { error } = await authClient.signIn.social({
+                provider,
+                callbackURL: "/", // 로그인 성공 시 이동할 경로
+            });
+
+            if (error) {
+                toast.error(`${provider} 로그인 중 오류가 발생했습니다.`);
+                console.error("Auth error:", error);
+            }
+        } catch (err) {
+            toast.error("인증 시스템에 연결할 수 없습니다.");
+            console.error("System error:", err);
+        } finally {
+            setLoadingProvider(null);
+        }
     };
 
     return (
