@@ -1,5 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 import { PrismaLibSql } from "@prisma/adapter-libsql";
+import { randomUUID } from "node:crypto"; // UUID 생성
 import "dotenv/config";
 
 const config = {
@@ -25,19 +26,29 @@ async function main() {
     // 2. Create Users
     const user1 = await prisma.user.create({
         data: {
+            id: randomUUID(), // Better Auth는 ID 필수 (수동 생성)
             email: "guest@staync.com",
             name: "Guest User",
+            emailVerified: true,
             status: "ONLINE",
+            image: "https://api.dicebear.com/7.x/avataaars/svg?seed=Guest", // Better Auth 호환
             avatarUrl: "https://api.dicebear.com/7.x/avataaars/svg?seed=Guest",
+            createdAt: new Date(),
+            updatedAt: new Date(),
         },
     });
 
     const aiAssistant = await prisma.user.create({
         data: {
+            id: randomUUID(),
             email: "ai@staync.com",
             name: "STAYnC AI",
+            emailVerified: true,
             status: "ONLINE",
+            image: "https://api.dicebear.com/7.x/bottts/svg?seed=STAYnC",
             avatarUrl: "https://api.dicebear.com/7.x/bottts/svg?seed=STAYnC",
+            createdAt: new Date(),
+            updatedAt: new Date(),
         },
     });
 
