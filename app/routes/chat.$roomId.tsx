@@ -7,8 +7,9 @@ import { MessageBubble } from "~/components/chat/message-bubble";
 import { ChatInput } from "~/components/chat/chat-input";
 import { DateSeparator } from "~/components/chat/date-separator";
 import { ScrollDownButton } from "~/components/chat/scroll-down-button";
+import { TypingIndicator } from "~/components/chat/typing-indicator";
 import { isSameDay } from "~/lib/date-utils";
-import { usePusherChannel } from "~/hooks/use-pusher"; // Custom Hook Import
+import { usePusherChannel } from "~/hooks/use-pusher";
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
     const session = await getSession(request);
@@ -65,6 +66,10 @@ export default function ChatRoomPage() {
     const [hasNewMessage, setHasNewMessage] = useState(false);
     const [isUploading, setIsUploading] = useState(false); // 업로드 상태
 
+    // 타이핑 중인 사용자 목록
+    const [typingUsers, setTypingUsers] = useState<Set<string>>(new Set());
+    const typingFetcher = useFetcher(); // 타이핑 전송용 별도 fetcher
+
     // Loader 데이터가 갱신되면 상태 동기화 (Pusher가 없어도 메시지 목록 최신화)
     useEffect(() => {
         setMessages(initialMessages);
@@ -99,12 +104,19 @@ export default function ChatRoomPage() {
     // 이벤트 핸들러를 useCallback으로 감싸지 않아도 동작하지만,
     // 훅 내부 구현(의존성 배열)에 따라 성능 최적화가 필요할 수 있음.
     // 여기서는 usePusherChannel이 channelName 변경 시에만 재구독하므로 안전함.
-    const { connectionState } = usePusherChannel(`room-${room.id}`, {
+    usePusherChannel(`room-${room.id}`, {
         "new-message": (data: any) => {
             setMessages((prev) => {
                 // 중복 방지 (이미 Optimistic으로 추가된 경우 등)
                 // 만약 ID가 같다면 덮어쓰거나 무시
                 if (prev.find(m => m.id === data.id)) return prev;
+
+                // 새 메시지가 오면 해당 유저의 타이핑 상태 제거
+                setTypingUsers(prevSet => {
+                    const newSet = new Set(prevSet);
+                    newSet.delete(data.senderId);
+                    return newSet;
+                });
 
                 // 새 메시지가 왔는데 스크롤이 위에 있다면 알림 표시
                 if (!isAtBottom) {
@@ -114,6 +126,25 @@ export default function ChatRoomPage() {
                 // 바닥이면 그냥 추가 (자동 스크롤은 useEffect에서 처리)
                 return [...prev, data];
             });
+        },
+        "user-typing": (data: { userId: string; isTyping: boolean }) => {
+            // 내가 보낸 건 무시
+            if (data.userId === user.id) return;
+
+            setTypingUsers(prev => {
+                const newSet = new Set(prev);
+                if (data.isTyping) {
+                    newSet.add(data.userId);
+                } else {
+                    newSet.delete(data.userId);
+                }
+                return newSet;
+            });
+
+            // 타이핑 시작 시 바닥에 있다면 스크롤 살짝 조정
+            if (isAtBottom && data.isTyping) {
+                setTimeout(() => scrollToBottom(), 100);
+            }
         }
     });
 
@@ -149,6 +180,15 @@ export default function ChatRoomPage() {
         fetcher.submit(formData, { method: "post", action: "/api/messages" });
         // 전송 직후 스크롤 내리기 (낙관적 업데이트보다 빠르게 반응)
         setTimeout(() => scrollToBottom(), 50);
+    };
+
+    // 타이핑 이벤트 전송 (api.typing.ts 호출)
+    const handleStreamingTyping = (isTyping: boolean) => {
+        const formData = new FormData();
+        formData.append("roomId", room.id);
+        formData.append("isTyping", isTyping.toString());
+        // 메인 fetcher와 분리된 typingFetcher 사용
+        typingFetcher.submit(formData, { method: "post", action: "/api/typing" });
     };
 
     const handleImageSelect = async (file: File) => {
@@ -188,6 +228,8 @@ export default function ChatRoomPage() {
         }
     };
 
+    const isPartnerTyping = partner ? typingUsers.has(partner.id) : typingUsers.size > 0;
+
     return (
         <SafeArea className="bg-background flex flex-col h-full pt-20 relative">
             <AppHeader
@@ -195,14 +237,6 @@ export default function ChatRoomPage() {
                 showBack={true}
                 onBack={() => navigate("/chat")}
             />
-
-            {/* 🔥 Pusher 연결 상태 디버깅용 (추후 제거) */}
-            <div className={`text-[10px] text-center py-1 font-bold ${connectionState === "connected" ? "bg-green-500/10 text-green-400" :
-                connectionState === "connecting" ? "bg-yellow-500/10 text-yellow-400" :
-                    "bg-red-500/10 text-red-500"
-                }`}>
-                Real-time Status: {connectionState?.toUpperCase()}
-            </div>
 
             <div
                 ref={scrollRef}
@@ -249,6 +283,9 @@ export default function ChatRoomPage() {
                         senderImage={user.image || undefined}
                     />
                 )}
+
+                {/* ✨ Typing Indicator ✨ */}
+                <TypingIndicator isTyping={isPartnerTyping} />
             </div>
 
             <ScrollDownButton
@@ -261,6 +298,7 @@ export default function ChatRoomPage() {
                 onSend={handleSend}
                 onImageSelect={handleImageSelect}
                 isLoading={fetcher.state === "submitting" || isUploading}
+                onTyping={handleStreamingTyping}
             />
         </SafeArea>
     );

@@ -15,6 +15,8 @@ export async function action({ request }: ActionFunctionArgs) {
     }
 
     try {
+        console.log(`[Typing API] User ${user.email} is ${isTyping ? "typing..." : "stopped typing"} in room ${roomId}`);
+
         await pusherServer.trigger(`room-${roomId}`, "user-typing", {
             userId: user.id,
             userName: user.name,
