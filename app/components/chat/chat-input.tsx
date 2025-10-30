@@ -4,12 +4,14 @@ import { motion, AnimatePresence } from "framer-motion";
 
 interface ChatInputProps {
     onSend: (message: string) => void;
+    onImageSelect?: (file: File) => void;
     isLoading?: boolean;
 }
 
-export function ChatInput({ onSend, isLoading = false }: ChatInputProps) {
+export function ChatInput({ onSend, onImageSelect, isLoading = false }: ChatInputProps) {
     const [message, setMessage] = useState("");
     const textareaRef = useRef<HTMLTextAreaElement>(null);
+    const fileInputRef = useRef<HTMLInputElement>(null);
 
     // Auto-resize logic
     useEffect(() => {
@@ -34,11 +36,32 @@ export function ChatInput({ onSend, isLoading = false }: ChatInputProps) {
         setMessage("");
     };
 
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file && onImageSelect) {
+            onImageSelect(file);
+        }
+        // 초기화 (같은 파일 다시 선택 가능하게)
+        if (fileInputRef.current) fileInputRef.current.value = "";
+    };
+
     return (
         <div className="p-4 bg-black/40 backdrop-blur-xl border-t border-white/10 pb-8"> {/* pb-8 for safe area */}
             <div className="flex items-end gap-3 max-w-3xl mx-auto">
+                {/* File Input (Hidden) */}
+                <input
+                    type="file"
+                    ref={fileInputRef}
+                    className="hidden"
+                    accept="image/*"
+                    onChange={handleFileChange}
+                />
+
                 {/* Plus Button (For Attachments) */}
-                <button className="p-2.5 rounded-full bg-white/5 text-white/60 hover:text-neon-blue hover:bg-neon-blue/10 transition-colors">
+                <button
+                    onClick={() => fileInputRef.current?.click()}
+                    className="p-2.5 rounded-full bg-white/5 text-white/60 hover:text-neon-blue hover:bg-neon-blue/10 transition-colors"
+                >
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                         <path d="M5 12h14m-7-7v14" />
                     </svg>

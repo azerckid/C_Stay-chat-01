@@ -1,4 +1,4 @@
-import { useRef, useEffect, useState, useCallback } from "react";
+import { useRef, useEffect, useState } from "react";
 import { type LoaderFunctionArgs, type ActionFunctionArgs, useLoaderData, useFetcher, useNavigate, useRevalidator } from "react-router";
 import { SafeArea, AppHeader } from "../components/layout";
 import { getSession, requireAuth } from "~/lib/auth.server";
@@ -6,6 +6,7 @@ import { prisma } from "~/lib/db.server";
 import { MessageBubble } from "~/components/chat/message-bubble";
 import { ChatInput } from "~/components/chat/chat-input";
 import { DateSeparator } from "~/components/chat/date-separator";
+import { ScrollDownButton } from "~/components/chat/scroll-down-button";
 import { isSameDay } from "~/lib/date-utils";
 import { usePusherChannel } from "~/hooks/use-pusher"; // Custom Hook Import
 
@@ -58,6 +59,12 @@ export default function ChatRoomPage() {
     const scrollRef = useRef<HTMLDivElement>(null);
     const revalidator = useRevalidator(); // 데이터 갱신용
 
+    // 스크롤 상태 관리
+    const [isAtBottom, setIsAtBottom] = useState(true);
+    const [showScrollButton, setShowScrollButton] = useState(false);
+    const [hasNewMessage, setHasNewMessage] = useState(false);
+    const [isUploading, setIsUploading] = useState(false); // 업로드 상태
+
     // Loader 데이터가 갱신되면 상태 동기화 (Pusher가 없어도 메시지 목록 최신화)
     useEffect(() => {
         setMessages(initialMessages);
@@ -73,6 +80,31 @@ export default function ChatRoomPage() {
         return () => clearInterval(timer);
     }, [revalidator]);
 
+    // 스크롤 핸들러 (위치 감지)
+    const handleScroll = () => {
+        if (!scrollRef.current) return;
+        const { scrollTop, scrollHeight, clientHeight } = scrollRef.current;
+        const isBottom = scrollHeight - scrollTop - clientHeight < 100; // 오차범위 100px
+
+        setIsAtBottom(isBottom);
+        setShowScrollButton(!isBottom);
+
+        // 바닥에 도달하면 새 메시지 알림 해제
+        if (isBottom) {
+            setHasNewMessage(false);
+        }
+    };
+
+    const scrollToBottom = (smooth = true) => {
+        if (scrollRef.current) {
+            scrollRef.current.scrollTo({
+                top: scrollRef.current.scrollHeight,
+                behavior: smooth ? "smooth" : "auto"
+            });
+            setHasNewMessage(false);
+        }
+    };
+
     // ✅ Real-time Hook 사용 (Clean & Professional)
     // 이벤트 핸들러를 useCallback으로 감싸지 않아도 동작하지만,
     // 훅 내부 구현(의존성 배열)에 따라 성능 최적화가 필요할 수 있음.
@@ -83,30 +115,91 @@ export default function ChatRoomPage() {
                 // 중복 방지 (이미 Optimistic으로 추가된 경우 등)
                 // 만약 ID가 같다면 덮어쓰거나 무시
                 if (prev.find(m => m.id === data.id)) return prev;
+
+                // 새 메시지가 왔는데 스크롤이 위에 있다면 알림 표시
+                if (!isAtBottom) {
+                    setHasNewMessage(true);
+                    return [...prev, data];
+                }
+                // 바닥이면 그냥 추가 (자동 스크롤은 useEffect에서 처리)
                 return [...prev, data];
             });
         }
     });
 
-    // 스크롤 동기화
+    // 메시지 추가 시 자동 스크롤 로직
     useEffect(() => {
-        if (scrollRef.current) {
-            scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
-            setTimeout(() => {
-                if (scrollRef.current) scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
-            }, 100);
+        const lastMessage = messages[messages.length - 1];
+        if (!lastMessage) return;
+
+        // 1. 내가 보낸 메시지인 경우 -> 무조건 스크롤
+        if (lastMessage.senderId === user.id) {
+            scrollToBottom();
+            return;
         }
-    }, [messages, fetcher.state]); // 메시지가 추가되거나 전송 상태가 바뀔 때 스크롤
+
+        // 2. 남이 보낸 메시지
+        if (isAtBottom) {
+            scrollToBottom();
+        } else {
+            // 보고 있는 위치 유지 (아무것도 안 함)
+            // 대신 위지 감지 로직에서 setHasNewMessage(true) 처리됨
+        }
+    }, [messages, user.id, isAtBottom]);
+
+    // 페이지 최초 진입 시 스크롤 바닥으로
+    useEffect(() => {
+        scrollToBottom(false);
+    }, []);
 
     const handleSend = (text: string) => {
         const formData = new FormData();
         formData.append("content", text);
         formData.append("roomId", room.id); // API에 roomId 전달 필수
         fetcher.submit(formData, { method: "post", action: "/api/messages" });
+        // 전송 직후 스크롤 내리기 (낙관적 업데이트보다 빠르게 반응)
+        setTimeout(() => scrollToBottom(), 50);
+    };
+
+    const handleImageSelect = async (file: File) => {
+        if (!file) return;
+        setIsUploading(true);
+
+        try {
+            // 1. Cloudinary 업로드
+            const uploadData = new FormData();
+            uploadData.append("file", file);
+
+            const response = await fetch("/api/upload", {
+                method: "POST",
+                body: uploadData
+            });
+
+            if (!response.ok) throw new Error("Upload failed");
+
+            const { url } = await response.json();
+
+            // 2. 메시지 전송 (type=IMAGE, content=URL)
+            // fetcher.submit은 multipart/form-data를 기본으로 처리하므로 
+            // type 필드를 추가해서 보냅니다.
+            const formData = new FormData();
+            formData.append("content", url);
+            formData.append("roomId", room.id);
+            formData.append("type", "IMAGE"); // 이미지 타입 명시
+
+            fetcher.submit(formData, { method: "post", action: "/api/messages" });
+            setTimeout(() => scrollToBottom(), 50);
+
+        } catch (error) {
+            console.error("Image upload/send error:", error);
+            alert("이미지 전송에 실패했습니다.");
+        } finally {
+            setIsUploading(false);
+        }
     };
 
     return (
-        <SafeArea className="bg-background flex flex-col h-full pt-20">
+        <SafeArea className="bg-background flex flex-col h-full pt-20 relative">
             <AppHeader
                 title={partner?.name || room.name || "Unknown"}
                 showBack={true}
@@ -115,6 +208,7 @@ export default function ChatRoomPage() {
 
             <div
                 ref={scrollRef}
+                onScroll={handleScroll}
                 className="flex-1 overflow-y-auto p-4 space-y-2 scrollbar-hide"
             >
                 {messages.length === 0 && (
@@ -147,8 +241,8 @@ export default function ChatRoomPage() {
                     );
                 })}
 
-                {/* Optimistic UI */}
-                {fetcher.state === "submitting" && fetcher.formData && (
+                {/* Optimistic UI (Text Only for now) */}
+                {fetcher.state === "submitting" && !fetcher.formData?.get("type") && fetcher.formData?.get("content") && (
                     <MessageBubble
                         content={fetcher.formData.get("content") as string}
                         isMe={true}
@@ -159,9 +253,16 @@ export default function ChatRoomPage() {
                 )}
             </div>
 
+            <ScrollDownButton
+                show={showScrollButton}
+                onClick={() => scrollToBottom()}
+                hasNewMessage={hasNewMessage}
+            />
+
             <ChatInput
                 onSend={handleSend}
-                isLoading={fetcher.state === "submitting"}
+                onImageSelect={handleImageSelect}
+                isLoading={fetcher.state === "submitting" || isUploading}
             />
         </SafeArea>
     );

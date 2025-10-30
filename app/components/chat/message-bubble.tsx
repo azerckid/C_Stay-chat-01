@@ -10,7 +10,7 @@ interface MessageBubbleProps {
     senderName?: string;
     senderImage?: string;
     type?: "TEXT" | "IMAGE" | "SYSTEM";
-    isChain?: boolean; // 연속된 메시지 여부 (true면 프로필/시간 생략 등)
+    isChain?: boolean;
 }
 
 export function MessageBubble({
@@ -42,10 +42,10 @@ export function MessageBubble({
             className={cn(
                 "flex w-full gap-3",
                 isMe ? "justify-end" : "justify-start",
-                isChain ? "mb-1" : "mb-4 mt-2" // 연속되면 간격 좁게, 아니면 넓게
+                isChain ? "mb-1" : "mb-4 mt-2"
             )}
         >
-            {/* 상대방 프로필 (내가 아님 AND 연속된 메시지가 아닐 때만 표시) */}
+            {/* ... (생략: 프로필 영역) ... */}
             {!isMe && (
                 <div className="shrink-0 flex flex-col items-center w-8">
                     {!isChain ? (
@@ -59,14 +59,13 @@ export function MessageBubble({
                             )}
                         </div>
                     ) : (
-                        // 자리 차지만 함 (들여쓰기 유지)
                         <div className="w-8" />
                     )}
                 </div>
             )}
 
             <div className={cn("flex flex-col max-w-[70%]", isMe && "items-end")}>
-                {/* 이름 (상대방 AND 첫 메시지일 때만) */}
+                {/* 이름 영역 (생략) */}
                 {!isMe && !isChain && (
                     <span className="text-[10px] text-muted-foreground ml-1 mb-1">
                         {senderName}
@@ -74,28 +73,41 @@ export function MessageBubble({
                 )}
 
                 <div className="flex items-end gap-2">
-                    {/* 내 메시지 시간 (왼쪽) */}
+                    {/* 내 시간 (생략) */}
                     {isMe && (
                         <span className={cn("text-[10px] text-white/30 mb-1 min-w-[40px] text-right", isChain && "opacity-0 group-hover:opacity-100 transition-opacity")}>
                             {timeString}
                         </span>
                     )}
 
-                    {/* 말풍선 본문 (링크 적용) */}
-                    <div className={cn(
-                        "px-4 py-3 rounded-2xl text-sm leading-relaxed break-words shadow-sm",
-                        isMe
-                            ? "bg-gradient-to-br from-neon-purple to-indigo-600 text-white"
-                            : "bg-white/10 text-white/90 border border-white/5",
-                        // 말풍선 꼬리 처리
-                        isMe && !isChain && "rounded-tr-none", // 내 첫 메시지
-                        !isMe && !isChain && "rounded-tl-none", // 상대 첫 메시지
-                        isChain && "rounded-2xl" // 연속 메시지는 둥글게
-                    )}>
-                        {linkify(content)}
-                    </div>
+                    {/* 말풍선 본문 (이미지 vs 텍스트) */}
+                    {type === "IMAGE" ? (
+                        <div className={cn(
+                            "rounded-2xl overflow-hidden shadow-sm border border-white/10",
+                            isMe ? "rounded-tr-none" : "rounded-tl-none"
+                        )}>
+                            <img
+                                src={content}
+                                alt="Shared Image"
+                                className="max-w-full h-auto object-cover max-h-[300px]"
+                                loading="lazy"
+                            />
+                        </div>
+                    ) : (
+                        <div className={cn(
+                            "px-4 py-3 rounded-2xl text-sm leading-relaxed break-words shadow-sm",
+                            isMe
+                                ? "bg-gradient-to-br from-neon-purple to-indigo-600 text-white"
+                                : "bg-white/10 text-white/90 border border-white/5",
+                            isMe && !isChain && "rounded-tr-none",
+                            !isMe && !isChain && "rounded-tl-none",
+                            isChain && "rounded-2xl"
+                        )}>
+                            {linkify(content)}
+                        </div>
+                    )}
 
-                    {/* 상대방 메시지 시간 (오른쪽) */}
+                    {/* 상대방 시간 (생략) */}
                     {!isMe && (
                         <span className={cn("text-[10px] text-white/30 mb-1 min-w-[40px] text-left", isChain && "opacity-0 group-hover:opacity-100 transition-opacity")}>
                             {timeString}

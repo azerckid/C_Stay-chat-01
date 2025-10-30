@@ -7,7 +7,8 @@ export default [
 
     // API Routes (Resource Routes)
     route("api/rooms", "routes/api.rooms.ts", { id: "api-rooms" }),
-    route("api/messages", "routes/api.messages.ts", { id: "api-messages" }),
+    route("api/messages", "routes/api.messages.ts"),
+    route("api/upload", "routes/api.upload.ts"),
     route("api/rooms/:roomId/messages", "routes/api.rooms.$roomId.messages.ts", { id: "api-room-messages" }),
 
     route("concierge", "routes/chat.tsx", { id: "concierge" }), // 같은 파일을 쓰더라도 id가 다르므로 충돌 없음
