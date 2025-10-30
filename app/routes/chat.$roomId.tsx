@@ -5,6 +5,8 @@ import { getSession, requireAuth } from "~/lib/auth.server";
 import { prisma } from "~/lib/db.server";
 import { MessageBubble } from "~/components/chat/message-bubble";
 import { ChatInput } from "~/components/chat/chat-input";
+import { DateSeparator } from "~/components/chat/date-separator";
+import { isSameDay } from "~/lib/date-utils";
 import { usePusherChannel } from "~/hooks/use-pusher"; // Custom Hook Import
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
@@ -121,17 +123,29 @@ export default function ChatRoomPage() {
                     </div>
                 )}
 
-                {messages.map((msg) => (
-                    <MessageBubble
-                        key={msg.id}
-                        content={msg.content}
-                        isMe={msg.senderId === user.id}
-                        createdAt={msg.createdAt}
-                        senderName={msg.sender.name}
-                        senderImage={msg.sender.image || undefined}
-                        type={msg.type as any}
-                    />
-                ))}
+                {messages.map((msg, index) => {
+                    const prevMsg = messages[index - 1];
+                    const showDateSeparator = !prevMsg || !isSameDay(prevMsg.createdAt, msg.createdAt);
+                    // 연속된 메시지인지 판단 (보낸사람 같음 + 날짜구분선 없음)
+                    const isChain = !!prevMsg && prevMsg.senderId === msg.senderId && !showDateSeparator;
+
+                    return (
+                        <div key={msg.id}>
+                            {showDateSeparator && (
+                                <DateSeparator date={msg.createdAt} />
+                            )}
+                            <MessageBubble
+                                content={msg.content}
+                                isMe={msg.senderId === user.id}
+                                createdAt={msg.createdAt}
+                                senderName={msg.sender.name}
+                                senderImage={msg.sender.image || undefined}
+                                type={msg.type as any}
+                                isChain={isChain}
+                            />
+                        </div>
+                    );
+                })}
 
                 {/* Optimistic UI */}
                 {fetcher.state === "submitting" && fetcher.formData && (
