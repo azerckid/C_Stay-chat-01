@@ -24,4 +24,5 @@ export function requireAuth(session: SessionResult, request: Request) {
         const redirectTo = url.pathname + url.search;
         throw redirect(`/login?redirectTo=${redirectTo}`);
     }
+    return session.user;
 }
