@@ -6,20 +6,68 @@ interface ChatInputProps {
     onSend: (message: string) => void;
     onImageSelect?: (file: File) => void;
     isLoading?: boolean;
+    onTyping?: (isTyping: boolean) => void; // 타이핑 상태 전달 콜백 추가
 }
 
-export function ChatInput({ onSend, onImageSelect, isLoading = false }: ChatInputProps) {
+export function ChatInput({ onSend, onImageSelect, isLoading = false, onTyping }: ChatInputProps) {
     const [message, setMessage] = useState("");
     const textareaRef = useRef<HTMLTextAreaElement>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
+    const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null); // 타이핑 감지 타이머
 
-    // Auto-resize logic
+    const adjustHeight = () => {
+        const textarea = textareaRef.current;
+        if (!textarea) return;
+
+        textarea.style.height = "auto";
+        const newHeight = Math.min(textarea.scrollHeight, 120);
+        textarea.style.height = `${newHeight}px`;
+    };
+
+    // Auto-resize logic (initial adjustment)
     useEffect(() => {
+        adjustHeight();
+    }, []); // Run once on mount
+
+    const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+        setMessage(e.target.value);
+        adjustHeight();
+
+        // 타이핑 감지 로직
+        if (onTyping) {
+            // 이미 타이머가 돌고 있다면 취소 (아직 계속 치는 중이라는 뜻)
+            if (typingTimeoutRef.current) {
+                clearTimeout(typingTimeoutRef.current);
+            } else {
+                // 타이머가 없었다면 -> '방금 타이핑 시작함' 이벤트 발송
+                onTyping(true);
+            }
+
+            // 2초 동안 입력 없으면 -> '타이핑 멈춤' 이벤트 발송
+            typingTimeoutRef.current = setTimeout(() => {
+                onTyping(false);
+                typingTimeoutRef.current = null;
+            }, 2000);
+        }
+    };
+
+    const handleSend = () => {
+        if (!message.trim() || isLoading) return;
+        onSend(message);
+        setMessage("");
+
+        // 전송 시 즉시 타이핑 멈춤 처리
+        if (typingTimeoutRef.current) {
+            clearTimeout(typingTimeoutRef.current);
+            typingTimeoutRef.current = null;
+            if (onTyping) onTyping(false);
+        }
+
+        // 높이 초기화
         if (textareaRef.current) {
             textareaRef.current.style.height = "auto";
-            textareaRef.current.style.height = `${Math.min(textareaRef.current.scrollHeight, 120)}px`;
         }
-    }, [message]);
+    };
 
     const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
         if (e.key === "Enter" && !e.shiftKey) {
@@ -28,12 +76,6 @@ export function ChatInput({ onSend, onImageSelect, isLoading = false }: ChatInpu
             if (e.nativeEvent.isComposing) return;
             handleSend();
         }
-    };
-
-    const handleSend = () => {
-        if (!message.trim() || isLoading) return;
-        onSend(message);
-        setMessage("");
     };
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {

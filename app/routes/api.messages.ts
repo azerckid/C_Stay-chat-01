@@ -11,6 +11,7 @@ export async function action({ request }: ActionFunctionArgs) {
         const formData = await request.formData();
         const roomId = formData.get("roomId") as string;
         const content = formData.get("content") as string;
+        const type = (formData.get("type") as string) || "TEXT"; // type 필드 수신
 
         if (!roomId || !content) {
             return data({ error: "Missing required fields" }, { status: 400 });
@@ -31,7 +32,7 @@ export async function action({ request }: ActionFunctionArgs) {
                 roomId,
                 senderId: user.id,
                 content,
-                type: "TEXT"
+                type // 수신한 type 사용
             },
             include: {
                 sender: {
@@ -50,6 +51,7 @@ export async function action({ request }: ActionFunctionArgs) {
 
         // 4. 실시간 이벤트 발송 (Pusher) - 실패해도 메시지 전송은 성공으로 처리
         try {
+            console.log(`[Pusher Trigger] Sending to channel: room-${roomId}`);
             await pusherServer.trigger(`room-${roomId}`, "new-message", {
                 id: newMessage.id,
                 content: newMessage.content,
@@ -61,8 +63,9 @@ export async function action({ request }: ActionFunctionArgs) {
                     image: newMessage.sender.image
                 }
             });
+            console.log("[Pusher Trigger] Success ✅");
         } catch (error) {
-            console.error("Failed to trigger Pusher event:", error);
+            console.error("[Pusher Trigger] Failed ❌:", error);
             // 에러를 무시하고 진행 (메시지는 저장되었으므로)
         }
 

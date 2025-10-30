@@ -70,16 +70,6 @@ export default function ChatRoomPage() {
         setMessages(initialMessages);
     }, [initialMessages]);
 
-    // ✅ Polling (Pusher 고장 시 대비용 - 3초마다 갱신)
-    useEffect(() => {
-        const timer = setInterval(() => {
-            if (document.visibilityState === "visible") {
-                revalidator.revalidate();
-            }
-        }, 3000);
-        return () => clearInterval(timer);
-    }, [revalidator]);
-
     // 스크롤 핸들러 (위치 감지)
     const handleScroll = () => {
         if (!scrollRef.current) return;
@@ -109,7 +99,7 @@ export default function ChatRoomPage() {
     // 이벤트 핸들러를 useCallback으로 감싸지 않아도 동작하지만,
     // 훅 내부 구현(의존성 배열)에 따라 성능 최적화가 필요할 수 있음.
     // 여기서는 usePusherChannel이 channelName 변경 시에만 재구독하므로 안전함.
-    usePusherChannel(`room-${room.id}`, {
+    const { connectionState } = usePusherChannel(`room-${room.id}`, {
         "new-message": (data: any) => {
             setMessages((prev) => {
                 // 중복 방지 (이미 Optimistic으로 추가된 경우 등)
@@ -205,6 +195,14 @@ export default function ChatRoomPage() {
                 showBack={true}
                 onBack={() => navigate("/chat")}
             />
+
+            {/* 🔥 Pusher 연결 상태 디버깅용 (추후 제거) */}
+            <div className={`text-[10px] text-center py-1 font-bold ${connectionState === "connected" ? "bg-green-500/10 text-green-400" :
+                connectionState === "connecting" ? "bg-yellow-500/10 text-yellow-400" :
+                    "bg-red-500/10 text-red-500"
+                }`}>
+                Real-time Status: {connectionState?.toUpperCase()}
+            </div>
 
             <div
                 ref={scrollRef}

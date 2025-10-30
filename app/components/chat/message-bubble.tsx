@@ -35,6 +35,13 @@ export function MessageBubble({
 
     const timeString = formatMessageTime(createdAt);
 
+    // 이미지 URL인지 확인하는 정규식 (Cloudinary URL 등 포함)
+    const isImageUrl = (text: string) => {
+        return /\.(jpeg|jpg|gif|png|webp)$/i.test(text) || text.includes("/image/upload/");
+    };
+
+    const showAsImage = type === "IMAGE" || (type === "TEXT" && isImageUrl(content));
+
     return (
         <motion.div
             initial={{ opacity: 0, y: 5 }}
@@ -81,7 +88,7 @@ export function MessageBubble({
                     )}
 
                     {/* 말풍선 본문 (이미지 vs 텍스트) */}
-                    {type === "IMAGE" ? (
+                    {showAsImage ? (
                         <div className={cn(
                             "rounded-2xl overflow-hidden shadow-sm border border-white/10",
                             isMe ? "rounded-tr-none" : "rounded-tl-none"
