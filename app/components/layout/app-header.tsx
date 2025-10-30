@@ -6,6 +6,7 @@ interface AppHeaderProps extends React.HTMLAttributes<HTMLElement> {
     showLogo?: boolean;
     showStatus?: boolean;
     showBack?: boolean;
+    onBack?: () => void;
 }
 
 /**
@@ -16,7 +17,8 @@ export function AppHeader({
     title,
     showLogo = true,
     showStatus = true,
-    showBack = false, // 기본값 false
+    showBack = false,
+    onBack,
     className,
     ...props
 }: AppHeaderProps) {
@@ -30,7 +32,17 @@ export function AppHeader({
             {...props}
         >
             <div className="flex items-center gap-4">
-                {showLogo && (
+                {showBack && (
+                    <button
+                        onClick={onBack}
+                        className="p-1 -ml-1 text-white/70 hover:text-white transition-colors"
+                    >
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M15 18l-6-6 6-6" />
+                        </svg>
+                    </button>
+                )}
+                {showLogo && !showBack && (
                     <img
                         src={logoDark}
                         alt="STAYnC"

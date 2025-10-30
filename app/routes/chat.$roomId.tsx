@@ -111,7 +111,7 @@ export default function ChatRoomPage() {
 
             <div
                 ref={scrollRef}
-                className="flex-1 overflow-y-auto p-4 space-y-2 scrollbar-hide"
+                className="flex-1 overflow-y-auto p-4 space-y-2 scrollbar-hide pt-20"
             >
                 {messages.length === 0 && (
                     <div className="text-center text-white/30 text-sm py-10">

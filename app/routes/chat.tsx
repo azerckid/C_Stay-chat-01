@@ -85,7 +85,7 @@ export default function ChatListPage() {
         <SafeArea className="bg-background">
             <AppHeader title="Messages" showBack={false} />
 
-            <div className="flex-1 overflow-y-auto p-4 space-y-4 scrollbar-hide">
+            <div className="flex-1 overflow-y-auto p-4 space-y-4 scrollbar-hide pt-20">
                 {rooms.length === 0 ? (
                     <div className="h-full flex flex-col items-center justify-center text-center space-y-4 opacity-70 mt-20">
                         <div className="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center mb-4">
