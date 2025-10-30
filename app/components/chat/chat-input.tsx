@@ -19,9 +19,11 @@ export function ChatInput({ onSend, isLoading = false }: ChatInputProps) {
         }
     }, [message]);
 
-    const handleKeyDown = (e: React.KeyboardEvent) => {
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
         if (e.key === "Enter" && !e.shiftKey) {
             e.preventDefault();
+            // 한글 조합 중일 때 전송 방지
+            if (e.nativeEvent.isComposing) return;
             handleSend();
         }
     };

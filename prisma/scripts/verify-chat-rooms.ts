@@ -22,7 +22,7 @@ async function main() {
             console.log(`[Room #${index + 1}] ID: ${room.id}`);
             console.log(` - 이름: ${room.name || "없음"}`);
             console.log(` - 타입: ${room.type}`);
-            console.log(` - 참여자: ${room.members.map(m => m.user.name).join(", ")}`);
+            console.log(` - 참여자: ${room.members.map(m => m.user?.name || "Unknown").join(", ")}`);
             console.log(` - 메시지 수: ${room.messages.length}개`);
             console.log("-----------------------------------");
         });

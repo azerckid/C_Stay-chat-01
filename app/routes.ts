@@ -4,6 +4,12 @@ export default [
     index("routes/home.tsx"),
     route("chat", "routes/chat.tsx", { id: "chat" }),
     route("chat/:roomId", "routes/chat.$roomId.tsx", { id: "chat-room" }),
+
+    // API Routes (Resource Routes)
+    route("api/rooms", "routes/api.rooms.ts", { id: "api-rooms" }),
+    route("api/messages", "routes/api.messages.ts", { id: "api-messages" }),
+    route("api/rooms/:roomId/messages", "routes/api.rooms.$roomId.messages.ts", { id: "api-room-messages" }),
+
     route("concierge", "routes/chat.tsx", { id: "concierge" }), // 같은 파일을 쓰더라도 id가 다르므로 충돌 없음
     route("login", "routes/login.tsx", { id: "login" }),
     route("profile", "routes/profile.tsx", { id: "profile" }),

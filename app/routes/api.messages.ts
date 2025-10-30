@@ -1,6 +1,7 @@
 import { type ActionFunctionArgs, data } from "react-router";
 import { getSession, requireAuth } from "~/lib/auth.server";
 import { prisma } from "~/lib/db.server";
+import { pusherServer } from "~/lib/pusher.server";
 
 export async function action({ request }: ActionFunctionArgs) {
     const session = await getSession(request);
@@ -39,14 +40,33 @@ export async function action({ request }: ActionFunctionArgs) {
             }
         });
 
+        // ... (기존 코드)
+
         // 3. 채팅방 UpdatedAt 갱신 (목록 정렬용)
         await prisma.room.update({
             where: { id: roomId },
             data: { updatedAt: new Date() }
         });
 
-        // TODO: Pusher로 실시간 이벤트 발송
-        // TODO: AI가 있는 방이라면 AI 답변 트리거
+        // 4. 실시간 이벤트 발송 (Pusher) - 실패해도 메시지 전송은 성공으로 처리
+        try {
+            await pusherServer.trigger(`room-${roomId}`, "new-message", {
+                id: newMessage.id,
+                content: newMessage.content,
+                senderId: newMessage.senderId,
+                createdAt: newMessage.createdAt.toISOString(),
+                type: newMessage.type,
+                sender: {
+                    name: newMessage.sender.name,
+                    image: newMessage.sender.image
+                }
+            });
+        } catch (error) {
+            console.error("Failed to trigger Pusher event:", error);
+            // 에러를 무시하고 진행 (메시지는 저장되었으므로)
+        }
+
+        // TODO: AI가 있는 방이라면 AI 답변 트리거 (Phase 7)
 
         return { success: true, message: newMessage };
 
