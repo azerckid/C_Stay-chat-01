@@ -141,6 +141,8 @@ export default function ChatRoomPage() {
                 return newSet;
             });
 
+            // ... (스크롤 로직 등)
+
             // 타이핑 시작 시 바닥에 있다면 스크롤 살짝 조정
             if (isAtBottom && data.isTyping) {
                 setTimeout(() => scrollToBottom(), 100);
