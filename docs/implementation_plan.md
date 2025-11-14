@@ -265,8 +265,8 @@
     - 상대방이 입력 중일 때 '...' 애니메이션 표시
     - Pusher `client-typing` 이벤트 연동
 - **검증 목록**:
-    - [ ] `ChatInput`에 입력 시 `typing` 이벤트가 발송되는가?
-    - [ ] 상대방 화면에 '입력 중...' 상태가 표시되는가?
+    - [x] `ChatInput`에 입력 시 `typing` 이벤트가 발송되는가?
+    - [x] 상대방 화면에 '입력 중...' 상태가 표시되는가?
 - **Git 커밋**: `feat(chat): 실시간 타이핑 인디케이터 구현`
 
 ### Step 35: 에러 처리 및 재전송 (Error Handling)
@@ -274,13 +274,82 @@
     - 전송 실패 시 빨간색 느낌표 아이콘 표시
     - 클릭 시 재전송 시도 로직
 - **검증 목록**:
-    - [ ] 네트워크 차단(오프라인) 시 전송 실패 UI가 뜨는가?
+    - [x] 네트워크 차단(오프라인) 시 전송 실패 UI가 뜨는가?
 - **Git 커밋**: `feat(chat): 메시지 전송 실패 UI 및 재전송 로직`
 
 ---
 
-## Phase 7: AI 에이전트 시스템 (Step 36-41)
-(LangGraph, Orchestrator, 컨시어지 툴 연동 등)
+### Step 36: 메시지 읽음 처리 (Read Receipt)
+- **작업**:
+    - 메시지가 화면에 노출될 때(`IntersectionObserver`) 읽음 API 호출
+    - DB 메시지 상태 업데이트 (`read: true`)
+    - 상대방 화면에 '읽음' (또는 숫자 1 사라짐) 실시간 반영 (Pusher `read-receipt`)
+- **검증 목록**:
+    - [ ] 상대방이 채팅방에 들어오면 내 보낸 메시지의 '안 읽음' 표시가 사라지는가?
+- **Git 커밋**: `feat(chat): 메시지 읽음 처리 및 실시간 동기화`
+
+---
+
+## Phase 7: AI 에이전트 시스템 (Step 37-42)
+(여행 컨시어지, LangGraph Orchestrator, 도구 연동)
+
+### Step 37: LangGraph 기반 Orchestrator 설정
+- **작업**:
+    - `app/agents/orchestrator.ts` 생성 및 StateGraph 정의
+    - 사용자 의도 분류(Intent Classification) 노드 구현 (일반 대화 vs 여행 계획)
+    - 기본 LLM 연동 (OpenAI or Gemini)
+- **검증 목록**:
+    - [ ] 사용자 입력에 대해 "여행 계획"인지 "일반 대화"인지 분류가 정확한가?
+- **Git 커밋**: `feat(ai): LangGraph Orchestrator 초기 설정 및 의도 분류`
+
+### Step 38: 여행 정보 검색 도구 (Tools) 구현
+- **작업**:
+    - `app/agents/tools/` 디렉토리 생성
+    - **Search Tool**: Tavily/Google Search API 연동 (관광지/맛집 정보)
+    - **Weather Tool**: 날씨 정보 조회
+    - **Flight Tool**: 모두투어 할인항공권 API 연동 (https://www.modetour.com/flights/discount-flight)
+- **검증 목록**:
+    - [ ] 에이전트가 질문에 따라 적절한 도구를 호출하는가?
+    - [ ] 도구의 실행 결과가 에이전트 State에 잘 반영되는가?
+- **Git 커밋**: `feat(ai): 검색 및 여행 정보 조회 도구 구현`
+
+### Step 39: 여행 계획 생성 에이전트 (Travel Planner)
+- **작업**:
+    - 여행 선호도 수집(Destination, Date, Budget, Style) 프롬프트 엔지니어링
+    - **Structured Output**: AI 응답을 단순 텍스트가 아닌 JSON 스키마로 강제
+    - `DayByDayPlan` (일자별 계획) 생성 로직
+- **검증 목록**:
+    - [ ] "제주도 2박 3일 코스 짜줘" 요청 시 구조화된 JSON 데이터가 생성되는가?
+- **Git 커밋**: `feat(ai): 여행 계획 생성 에이전트 및 Structured Output 설정`
+
+### Step 40: AI 채팅 인터페이스 및 스트리밍 (UI)
+- **작업**:
+    - `/concierge` 라우트 및 `AI_ChatRoom` 로직 구현
+    - AI 응답을 Pusher 또는 SSE로 실시간 스트리밍 (토큰 단위 출력)
+    - 'AI 생각 중...' (Thinking) 상태 표시
+- **검증 목록**:
+    - [ ] 사용자의 질문에 AI가 실시간으로 답변을 작성하는 모습이 보이는가?
+    - [ ] AI 답변 속도가 사용자 경험을 해치지 않는가?
+- **Git 커밋**: `feat(ai): AI 채팅 스트리밍 및 컨시어지 UI 연동`
+
+### Step 41: 구조화된 여행 카드 UI (Interactive UI)
+- **작업**:
+    - AI가 보낸 JSON 데이터를 **동적 React 컴포넌트**로 렌더링
+    - `PlanCard`, `PlaceCard`, `FlightCard` 컴포넌트 구현
+    - 지도에 위치 표시하기 (Kakao/Google Map 연동 준비)
+- **검증 목록**:
+    - [ ] 텍스트 대신 깔끔한 카드 형태로 추천 여행지가 표시되는가?
+    - [ ] 장소 클릭 시 상세 정보가 뜨는가?
+- **Git 커밋**: `feat(ui): AI 여행 추천 카드 컴포넌트 구현`
+
+### Step 42: 컨시어지 문맥(Context) 관리 및 최적화
+- **작업**:
+    - 대화 히스토리(Memory) 관리 (이전 질문 기억하기)
+    - 사용자 프로필(여행 스타일) 기반 추천 가중치 조정
+    - 응답 속도 및 프롬프트 최적화
+- **검증 목록**:
+    - [ ] "거기 말고 다른 곳 추천해줘" 라고 했을 때 '거기'가 어디인지 아는가?
+- **Git 커밋**: `refactor(ai): 대화 맥락 유지 및 프롬프트 최적화`
 
 ---
 
