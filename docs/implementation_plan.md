@@ -320,11 +320,8 @@
     - [x] `General Chat Agent` (LLM) 생성 (`app/agents/chat_agent.ts`)
 - **검증 목록**:
     - [x] 통합 테스트 (`scripts/test-orchestrator.ts`) 완료 : 의도 분류 및 검색 답변 확인
+    - [x] "제주도 2박 3일 코스 짜줘" 요청 시 구조화된 JSON 데이터가 생성되는가? (검증 완료)
 - **Git 커밋**: `feat(ai): Orchestrator 및 하위 에이전트 통합`
-
-- **검증 목록**:
-    - [ ] "제주도 2박 3일 코스 짜줘" 요청 시 구조화된 JSON 데이터가 생성되는가?
-- **Git 커밋**: `feat(ai): 여행 계획 생성 에이전트 및 Structured Output 설정`
 
 ### Step 40: AI 채팅 인터페이스 및 스트리밍 (UI)
 - **작업**:

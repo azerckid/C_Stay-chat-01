@@ -6,8 +6,7 @@ async function testOrchestrator() {
     console.log("🤖 Orchestrator Integration Test Starting...\n");
 
     const inputs = [
-        "안녕, 반갑다!", // 예상: general_chat -> 인사 답변
-        "오사카 유니버셜 스튜디오 입장권 가격 알려줘", // 예상: travel_planning -> 검색 후 답변
+        "오사카 2박 3일 알짜배기 여행 일정 짜줘. 맛집 포함해서."
     ];
 
     for (const input of inputs) {
