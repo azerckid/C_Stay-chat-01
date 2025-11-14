@@ -313,11 +313,15 @@
     - [x] 도구가 검색 쿼리를 받아 올바른 JSON 결과를 반환하는가? (테스트 스크립트 검증 완료)
 - **Git 커밋**: `feat(ai): Tavily Search Tool 구현 및 테스트 완료`
 
-### Step 39: 여행 계획 생성 에이전트 (Travel Planner)
+### Step 39: AI 에이전트 상세 구현 (Concierge, General Chat)
 - **작업**:
-    - 여행 선호도 수집(Destination, Date, Budget, Style) 프롬프트 엔지니어링
-    - **Structured Output**: AI 응답을 단순 텍스트가 아닌 JSON 스키마로 강제
-    - `DayByDayPlan` (일자별 계획) 생성 로직
+    - [x] Orchestrator Graph에 하위 에이전트(노드) 연결 및 분기 로직 구현
+    - [x] `Travel Agent` (ReAct) 생성 및 Tavily Tool 바인딩 (`app/agents/travel_agent.ts`)
+    - [x] `General Chat Agent` (LLM) 생성 (`app/agents/chat_agent.ts`)
+- **검증 목록**:
+    - [x] 통합 테스트 (`scripts/test-orchestrator.ts`) 완료 : 의도 분류 및 검색 답변 확인
+- **Git 커밋**: `feat(ai): Orchestrator 및 하위 에이전트 통합`
+
 - **검증 목록**:
     - [ ] "제주도 2박 3일 코스 짜줘" 요청 시 구조화된 JSON 데이터가 생성되는가?
 - **Git 커밋**: `feat(ai): 여행 계획 생성 에이전트 및 Structured Output 설정`
