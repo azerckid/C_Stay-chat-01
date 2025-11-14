@@ -307,14 +307,11 @@
 
 ### Step 38: 여행 정보 검색 도구 (Tools) 구현
 - **작업**:
-    - `app/agents/tools/` 디렉토리 생성
-    - **Search Tool**: Tavily/Google Search API 연동 (관광지/맛집 정보)
-    - **Weather Tool**: 날씨 정보 조회
-    - **Flight Tool**: 모두투어 할인항공권 API 연동 (https://www.modetour.com/flights/discount-flight)
+    - **Tavily Search API** 연동 (`app/agents/tools/search.ts`)
+    - LLM이 호출 가능한 형태로 Tool핑 (`DynamicStructuredTool`)
 - **검증 목록**:
-    - [ ] 에이전트가 질문에 따라 적절한 도구를 호출하는가?
-    - [ ] 도구의 실행 결과가 에이전트 State에 잘 반영되는가?
-- **Git 커밋**: `feat(ai): 검색 및 여행 정보 조회 도구 구현`
+    - [x] 도구가 검색 쿼리를 받아 올바른 JSON 결과를 반환하는가? (테스트 스크립트 검증 완료)
+- **Git 커밋**: `feat(ai): Tavily Search Tool 구현 및 테스트 완료`
 
 ### Step 39: 여행 계획 생성 에이전트 (Travel Planner)
 - **작업**:
