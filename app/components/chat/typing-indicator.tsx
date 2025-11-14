@@ -8,7 +8,7 @@ export function TypingIndicator({ isTyping }: { isTyping: boolean }) {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 10 }}
-            className="flex items-center gap-1 px-4 py-2 ml-4 mb-2 w-fit bg-white/10 rounded-2xl rounded-tl-none border border-white/5"
+            className="flex items-center gap-1 px-4 py-2 ml-4 mb-2 w-fit bg-zinc-800 text-white rounded-2xl rounded-tl-none border border-white/10 shadow-md"
         >
             <span className="flex gap-1">
                 <motion.span

@@ -11,6 +11,8 @@ interface MessageBubbleProps {
     senderImage?: string;
     type?: "TEXT" | "IMAGE" | "SYSTEM";
     isChain?: boolean;
+    status?: "sending" | "sent" | "error"; // 전송 상태 추가
+    onRetry?: () => void; // 재전송 핸들러
 }
 
 export function MessageBubble({

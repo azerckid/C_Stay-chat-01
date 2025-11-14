@@ -128,8 +128,8 @@ export default function ChatRoomPage() {
             });
         },
         "user-typing": (data: { userId: string; isTyping: boolean }) => {
-            // 내가 보낸 건 무시
-            if (data.userId === user.id) return;
+            // 내가 보낸 건 무시 (ID 비교 강화)
+            if (String(data.userId) === String(user.id)) return;
 
             setTypingUsers(prev => {
                 const newSet = new Set(prev);
@@ -230,6 +230,7 @@ export default function ChatRoomPage() {
         }
     };
 
+    // 파트너이거나 타이핑 중인 유저가 있는 경우 (안전장치 포함)
     const isPartnerTyping = partner ? typingUsers.has(partner.id) : typingUsers.size > 0;
 
     return (

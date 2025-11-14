@@ -114,7 +114,7 @@ export function ChatInput({ onSend, onImageSelect, isLoading = false, onTyping }
                     <textarea
                         ref={textareaRef}
                         value={message}
-                        onChange={(e) => setMessage(e.target.value)}
+                        onChange={handleChange}
                         onKeyDown={handleKeyDown}
                         placeholder="메시지를 입력하세요..."
                         className="w-full bg-transparent border-none text-white placeholder-white/30 px-5 py-3.5 focus:ring-0 max-h-[120px] resize-none scrollbar-hide font-light leading-relaxed"
