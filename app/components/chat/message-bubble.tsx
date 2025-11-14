@@ -2,6 +2,7 @@ import { cn } from "~/lib/utils";
 import { motion } from "framer-motion";
 import { formatMessageTime } from "~/lib/date-utils";
 import { linkify } from "~/lib/text-utils";
+import { TimelineView } from "./timeline-view";
 
 interface MessageBubbleProps {
     content: string;
@@ -47,6 +48,18 @@ export function MessageBubble({
     };
 
     const showAsImage = type === "IMAGE" || (type === "TEXT" && isImageUrl(content));
+
+    // 여행 계획 JSON 파싱 (안전하게)
+    let travelPlan = null;
+    if (type === "TEXT" && content.includes("```json") && content.includes("itinerary")) {
+        try {
+            // 마크다운 코드 블록 제거 후 파싱
+            const jsonStr = content.match(/```json\n([\s\S]*?)\n```/)?.[1] || "";
+            travelPlan = JSON.parse(jsonStr);
+        } catch (e) {
+            console.error("Failed to parse travel plan JSON", e);
+        }
+    }
 
     // 아바타 렌더링 (공통)
     const avatarElement = (
@@ -130,18 +143,22 @@ export function MessageBubble({
                                 />
                             </div>
                         ) : (
-                            <div className={cn(
-                                "px-4 py-3 rounded-2xl text-sm leading-relaxed break-words shadow-sm",
-                                isMe
-                                    ? "bg-gradient-to-br from-neon-purple to-indigo-600 text-white"
-                                    : "bg-white/10 text-white/90 border border-white/5",
-                                isMe && !isChain && "rounded-tr-none",
-                                !isMe && !isChain && "rounded-tl-none",
-                                isChain && "rounded-2xl",
-                                status === "error" && "border-red-500/50 bg-red-500/10"
-                            )}>
-                                {linkify(content)}
-                            </div>
+                            travelPlan ? (
+                                <TimelineView plan={travelPlan} />
+                            ) : (
+                                <div className={cn(
+                                    "px-4 py-3 rounded-2xl text-sm leading-relaxed break-words shadow-sm",
+                                    isMe
+                                        ? "bg-gradient-to-br from-neon-purple to-indigo-600 text-white"
+                                        : "bg-white/10 text-white/90 border border-white/5",
+                                    isMe && !isChain && "rounded-tr-none",
+                                    !isMe && !isChain && "rounded-tl-none",
+                                    isChain && "rounded-2xl",
+                                    status === "error" && "border-red-500/50 bg-red-500/10"
+                                )}>
+                                    {linkify(content)}
+                                </div>
+                            )
                         )}
                     </div>
 

@@ -323,25 +323,19 @@
     - [x] "제주도 2박 3일 코스 짜줘" 요청 시 구조화된 JSON 데이터가 생성되는가? (검증 완료)
 - **Git 커밋**: `feat(ai): Orchestrator 및 하위 에이전트 통합`
 
-### Step 40: AI 채팅 인터페이스 및 스트리밍 (UI)
+### Step 40: AI 채팅 인터페이스 및 타임라인 UI (Concierge)
 - **작업**:
-    - `/concierge` 라우트 및 `AI_ChatRoom` 로직 구현
-    - AI 응답을 Pusher 또는 SSE로 실시간 스트리밍 (토큰 단위 출력)
-    - 'AI 생각 중...' (Thinking) 상태 표시
+    - [x] `/concierge` 라우트 및 자동 리다이렉트 구현 (`app/routes/concierge.tsx`)
+    - [x] `api.messages`에 AI 에이전트 비동기 호출 로직 연동
+    - [x] `TimelineView` 컴포넌트 구현: JSON 여행 계획을 시각적인 타임라인으로 표시
+    - [x] `MessageBubble` 수정: JSON 감지 및 TimelineView 렌더링
 - **검증 목록**:
-    - [ ] 사용자의 질문에 AI가 실시간으로 답변을 작성하는 모습이 보이는가?
-    - [ ] AI 답변 속도가 사용자 경험을 해치지 않는가?
-- **Git 커밋**: `feat(ai): AI 채팅 스트리밍 및 컨시어지 UI 연동`
+    - [x] `/concierge` 접속 시 AI 채팅방으로 자동 이동하는가?
+    - [x] AI가 "생각 중(Typing)" 상태를 보여주고 답변하는가?
+    - [x] 여행 계획이 텍스트가 아닌 타임라인 카드로 예쁘게 나오는가?
+- **Git 커밋**: `feat(ui): AI 채팅방 및 TimelineView 구현`
 
-### Step 41: 구조화된 여행 카드 UI (Interactive UI)
-- **작업**:
-    - AI가 보낸 JSON 데이터를 **동적 React 컴포넌트**로 렌더링
-    - `PlanCard`, `PlaceCard`, `FlightCard` 컴포넌트 구현
-    - 지도에 위치 표시하기 (Kakao/Google Map 연동 준비)
-- **검증 목록**:
-    - [ ] 텍스트 대신 깔끔한 카드 형태로 추천 여행지가 표시되는가?
-    - [ ] 장소 클릭 시 상세 정보가 뜨는가?
-- **Git 커밋**: `feat(ui): AI 여행 추천 카드 컴포넌트 구현`
+<!-- Step 41은 Step 40에 통합됨 -->
 
 ### Step 42: 컨시어지 문맥(Context) 관리 및 최적화
 - **작업**:
