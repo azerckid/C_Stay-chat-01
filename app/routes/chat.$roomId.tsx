@@ -284,6 +284,7 @@ export default function ChatRoomPage() {
                         createdAt={new Date()}
                         senderName={user.name}
                         senderImage={user.image || undefined}
+                        status="sending" // 전송 중 상태 표시
                     />
                 )}
 
