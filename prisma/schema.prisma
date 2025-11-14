@@ -111,6 +111,7 @@ model Message {
   senderId  String
   roomId    String
   createdAt DateTime @default(now())
+  read      Boolean  @default(false)
 
   sender User @relation(fields: [senderId], references: [id], onDelete: Cascade)
   room   Room @relation(fields: [roomId], references: [id], onDelete: Cascade)

@@ -277,15 +277,11 @@
     - [x] 네트워크 차단(오프라인) 시 전송 실패 UI가 뜨는가?
 - **Git 커밋**: `feat(chat): 메시지 전송 실패 UI 및 재전송 로직`
 
----
-
-### Step 36: 메시지 읽음 처리 (Read Receipt)
-- **작업**:
-    - 메시지가 화면에 노출될 때(`IntersectionObserver`) 읽음 API 호출
-    - DB 메시지 상태 업데이트 (`read: true`)
-    - 상대방 화면에 '읽음' (또는 숫자 1 사라짐) 실시간 반영 (Pusher `read-receipt`)
-- **검증 목록**:
-    - [ ] 상대방이 채팅방에 들어오면 내 보낸 메시지의 '안 읽음' 표시가 사라지는가?
+--- [x] Step 36: 메시지 읽음 처리 (Read Receipt)
+  - [x] `Message` 모델에 `read` 필드 추가 (Boolean, default: false)
+  - [x] 읽음 처리 API (`api.read.ts`) 구현
+  - [x] 클라이언트: 메시지가 화면에 노출될 때 API 호출 (Intersection Observer 또는 Scroll Event)
+  - [x] 실시간 업데이트: Pusher `read-receipt` 이벤트 수신 및 UI 반영 (숫자 1 제거 등) - [ ] 상대방이 채팅방에 들어오면 내 보낸 메시지의 '안 읽음' 표시가 사라지는가?
 - **Git 커밋**: `feat(chat): 메시지 읽음 처리 및 실시간 동기화`
 
 ---

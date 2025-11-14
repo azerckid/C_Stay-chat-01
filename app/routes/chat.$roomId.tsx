@@ -100,35 +100,51 @@ export default function ChatRoomPage() {
         }
     };
 
+    // 읽음 처리 함수
+    const markAsRead = async () => {
+        try {
+            await fetch("/api/read", {
+                method: "POST",
+                body: new URLSearchParams({ roomId: room.id }),
+            });
+        } catch (error) {
+            console.error("Failed to mark as read:", error);
+        }
+    };
+
+    // 메시지가 갱신되거나 스크롤이 바닥일 때 읽음 처리
+    useEffect(() => {
+        if (isAtBottom && messages.length > 0) {
+            markAsRead();
+        }
+    }, [messages, isAtBottom, room.id]);
+
     // ✅ Real-time Hook 사용 (Clean & Professional)
-    // 이벤트 핸들러를 useCallback으로 감싸지 않아도 동작하지만,
-    // 훅 내부 구현(의존성 배열)에 따라 성능 최적화가 필요할 수 있음.
-    // 여기서는 usePusherChannel이 channelName 변경 시에만 재구독하므로 안전함.
     usePusherChannel(`room-${room.id}`, {
         "new-message": (data: any) => {
             setMessages((prev) => {
-                // 중복 방지 (이미 Optimistic으로 추가된 경우 등)
-                // 만약 ID가 같다면 덮어쓰거나 무시
+                // 중복 방지
                 if (prev.find(m => m.id === data.id)) return prev;
 
-                // 새 메시지가 오면 해당 유저의 타이핑 상태 제거
                 setTypingUsers(prevSet => {
                     const newSet = new Set(prevSet);
                     newSet.delete(data.senderId);
                     return newSet;
                 });
 
-                // 새 메시지가 왔는데 스크롤이 위에 있다면 알림 표시
+                // 새 메시지가 왔을 때 내가 보고 있다면 읽음 처리
+                if (isAtBottom && document.visibilityState === "visible") {
+                    markAsRead();
+                }
+
                 if (!isAtBottom) {
                     setHasNewMessage(true);
                     return [...prev, data];
                 }
-                // 바닥이면 그냥 추가 (자동 스크롤은 useEffect에서 처리)
                 return [...prev, data];
             });
         },
         "user-typing": (data: { userId: string; isTyping: boolean }) => {
-            // 내가 보낸 건 무시 (ID 비교 강화)
             if (String(data.userId) === String(user.id)) return;
 
             setTypingUsers(prev => {
@@ -141,11 +157,16 @@ export default function ChatRoomPage() {
                 return newSet;
             });
 
-            // ... (스크롤 로직 등)
-
-            // 타이핑 시작 시 바닥에 있다면 스크롤 살짝 조정
             if (isAtBottom && data.isTyping) {
                 setTimeout(() => scrollToBottom(), 100);
+            }
+        },
+        "read-receipt": (data: { userId: string; roomId: string }) => {
+            // 상대방이 읽었음 -> 내 메시지들을 읽음 처리
+            if (String(data.userId) !== String(user.id)) {
+                setMessages(prev => prev.map(msg =>
+                    msg.senderId === user.id && !msg.read ? { ...msg, read: true } : msg
+                ));
             }
         }
     });
@@ -155,18 +176,13 @@ export default function ChatRoomPage() {
         const lastMessage = messages[messages.length - 1];
         if (!lastMessage) return;
 
-        // 1. 내가 보낸 메시지인 경우 -> 무조건 스크롤
         if (lastMessage.senderId === user.id) {
             scrollToBottom();
             return;
         }
 
-        // 2. 남이 보낸 메시지
         if (isAtBottom) {
             scrollToBottom();
-        } else {
-            // 보고 있는 위치 유지 (아무것도 안 함)
-            // 대신 위지 감지 로직에서 setHasNewMessage(true) 처리됨
         }
     }, [messages, user.id, isAtBottom]);
 
@@ -271,6 +287,7 @@ export default function ChatRoomPage() {
                                 senderImage={msg.sender.image || undefined}
                                 type={msg.type as any}
                                 isChain={isChain}
+                                read={(msg as any).read}
                             />
                         </div>
                     );
@@ -285,6 +302,7 @@ export default function ChatRoomPage() {
                         senderName={user.name}
                         senderImage={user.image || undefined}
                         status="sending" // 전송 중 상태 표시
+                        read={false}
                     />
                 )}
 

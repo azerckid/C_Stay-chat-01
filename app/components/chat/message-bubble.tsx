@@ -11,8 +11,9 @@ interface MessageBubbleProps {
     senderImage?: string;
     type?: "TEXT" | "IMAGE" | "SYSTEM";
     isChain?: boolean;
-    status?: "sending" | "sent" | "error"; // 전송 상태 추가
-    onRetry?: () => void; // 재전송 핸들러
+    status?: "sending" | "sent" | "error";
+    read?: boolean;
+    onRetry?: () => void;
 }
 
 export function MessageBubble({
@@ -24,6 +25,7 @@ export function MessageBubble({
     type = "TEXT",
     isChain = false,
     status = "sent",
+    read = true,
     onRetry
 }: MessageBubbleProps) {
     // 시스템 메시지
@@ -39,7 +41,7 @@ export function MessageBubble({
 
     const timeString = formatMessageTime(createdAt);
 
-    // 이미지 URL인지 확인하는 정규식 (Cloudinary URL 등 포함)
+    // 이미지 URL인지 확인하는 정규식
     const isImageUrl = (text: string) => {
         return /\.(jpeg|jpg|gif|png|webp)$/i.test(text) || text.includes("/image/upload/");
     };
@@ -93,6 +95,11 @@ export function MessageBubble({
                     {/* 내 시간 및 상태 (왼쪽) */}
                     {isMe && (
                         <div className="flex flex-col items-end min-w-[40px] mb-1">
+                            {/* 안 읽음 표시 (1) */}
+                            {!read && status === "sent" && (
+                                <span className="text-[10px] text-yellow-500 font-bold mb-0.5">1</span>
+                            )}
+
                             {status === "error" ? (
                                 <button onClick={onRetry} className="text-red-500 hover:text-red-400 transition-colors" title="재전송">
                                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" /><path d="M3 3v5h5" /><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16" /><path d="M3 21v-5h5" /></svg>

@@ -1,26 +1,27 @@
 
-import { type ActionFunctionArgs, json } from "@react-router/node";
-import { db } from "~/lib/db.server";
+import { type ActionFunctionArgs, data } from "react-router";
+import { prisma } from "~/lib/db.server";
 import { getSession } from "~/lib/auth.server";
 import { pusherServer } from "~/lib/pusher.server";
 
 export const action = async ({ request }: ActionFunctionArgs) => {
-    const session = await getSession(request.headers.get("Cookie"));
-    const user = session.get("user");
+    const session = await getSession(request);
 
-    if (!user) {
-        return json({ error: "Unauthorized" }, { status: 401 });
+    if (!session || !session.user) {
+        throw data({ error: "Unauthorized" }, { status: 401 });
     }
+
+    const user = session.user;
 
     const formData = await request.formData();
     const roomId = formData.get("roomId");
 
     if (typeof roomId !== "string") {
-        return json({ error: "Invalid room ID" }, { status: 400 });
+        throw data({ error: "Invalid room ID" }, { status: 400 });
     }
 
     // 1. 해당 방의 '상대방이 보낸 + 안 읽은' 메시지를 모두 읽음 처리
-    const updatedBatch = await db.message.updateMany({
+    const updatedBatch = await prisma.message.updateMany({
         where: {
             roomId: roomId,
             senderId: { not: user.id }, // 내가 보낸 건 제외
@@ -36,8 +37,9 @@ export const action = async ({ request }: ActionFunctionArgs) => {
         await pusherServer.trigger(`room-${roomId}`, "read-receipt", {
             userId: user.id, // 누가 읽었는지
             roomId: roomId,
+            count: updatedBatch.count
         });
     }
 
-    return json({ success: true, count: updatedBatch.count });
+    return data({ success: true, count: updatedBatch.count });
 };
