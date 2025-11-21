@@ -3,10 +3,6 @@ import { getSession, requireAuth } from "~/lib/auth.server";
 import { prisma } from "~/lib/db.server";
 import { pusherServer } from "~/lib/pusher.server";
 
-// AI 관련 Import
-import { orchestratorGraph } from "~/agents/orchestrator/graph";
-import { HumanMessage } from "@langchain/core/messages";
-
 export async function action({ request }: ActionFunctionArgs) {
     const session = await getSession(request);
     const user = requireAuth(session, request);
@@ -39,9 +35,7 @@ export async function action({ request }: ActionFunctionArgs) {
                 type
             },
             include: {
-                sender: {
-                    select: { id: true, name: true, image: true, avatarUrl: true }
-                }
+                sender: { select: { id: true, name: true, image: true, avatarUrl: true } }
             }
         });
 
@@ -69,7 +63,6 @@ export async function action({ request }: ActionFunctionArgs) {
         }
 
         // 5. AI 응답 처리 (비동기)
-        // 사용자가 보낸 메시지에 대해 AI가 대답해야 하는지 확인하고 처리
         void handleAIResponse(roomId, content, user.id);
 
         return { success: true, message: newMessage };
@@ -81,15 +74,18 @@ export async function action({ request }: ActionFunctionArgs) {
 }
 
 /**
- * AI 응답 처리 함수 (Background Process)
- * - 방에 AI가 있는지 확인
- * - 있으면 LangGraph 호출
- * - 결과 DB 저장 및 Pusher 전송
+ * AI 응답 처리 함수 - LangChain 대신 fetch로 직접 구현 (안정성 확보)
  */
 async function handleAIResponse(roomId: string, userMessage: string, senderId: string) {
     try {
         const AI_EMAIL = "ai@staync.com";
         const AI_NAME = "STAYnC Concierge";
+        const API_KEY = process.env.OPENAI_API_KEY;
+
+        if (!API_KEY) {
+            console.error("[AI] OPENAI_API_KEY is missing!");
+            return;
+        }
 
         // 1. 방 정보 및 AI 유저 존재 여부 확인
         const room = await prisma.room.findUnique({
@@ -101,31 +97,23 @@ async function handleAIResponse(roomId: string, userMessage: string, senderId: s
         // DB에서 AI 유저 찾기
         let aiUser = await prisma.user.findUnique({ where: { email: AI_EMAIL } });
 
-        // 없으면 자동 생성 (Self-healing)
+        // 없으면 자동 생성
         if (!aiUser) {
-            console.log("[AI] Creating AI Bot User...");
             aiUser = await prisma.user.create({
                 data: {
+                    id: crypto.randomUUID(),
                     email: AI_EMAIL,
                     name: AI_NAME,
-                    avatarUrl: "https://cdn-icons-png.flaticon.com/512/4712/4712035.png", // 로봇 아이콘
+                    avatarUrl: "https://upload.wikimedia.org/wikipedia/commons/0/04/ChatGPT_logo.svg",
+                    emailVerified: true,
+                    status: "ONLINE"
                 }
             });
         }
 
         // 2. 이 방에 AI가 있는지 확인
         const isAiInRoom = room.members.some(m => m.userId === aiUser!.id);
-
-        // *조건*: AI가 멤버로 있거나, 방 이름이 'Concierge'를 포함하면 응답
-        if (!isAiInRoom) {
-            // 이번 데모에서는 AI가 없는 방이면 조용히 리턴
-            return;
-        }
-
-        // 내가 AI라면 무시 (Loop 방지)
-        if (senderId === aiUser.id) return;
-
-        console.log(`[AI] Processing message in room ${roomId}...`);
+        if (!isAiInRoom || senderId === aiUser!.id) return;
 
         // 3. Typing Indicator ON
         await pusherServer.trigger(`room-${roomId}`, "user-typing", {
@@ -134,25 +122,62 @@ async function handleAIResponse(roomId: string, userMessage: string, senderId: s
             isTyping: true
         });
 
-        // 4. LangGraph 실행 (AI 생각 중...)
-        const result = await orchestratorGraph.invoke({
-            messages: [new HumanMessage(userMessage)]
+        // 4. 컨텍스트 로드 (최근 10개)
+        const history = await prisma.message.findMany({
+            where: { roomId: roomId },
+            orderBy: { createdAt: "desc" },
+            take: 10,
+            include: { sender: true }
+        });
+        const sortedHistory = history.reverse();
+
+        // 5. OpenAI 메시지 포맷으로 변환
+        const messagesForLLM = sortedHistory.map(msg => ({
+            role: msg.senderId === aiUser!.id ? "assistant" : "user",
+            content: msg.content.length > 500 ? msg.content.slice(0, 500) + "..." : msg.content
+        })).filter(m => m.content && m.content.trim() !== "");
+
+        // 최신 메시지가 혹시 안 들어갔으면 추가 (보통 DB create 직후라 들어가있음)
+        const lastMsg = messagesForLLM[messagesForLLM.length - 1];
+        if (!lastMsg || lastMsg.content !== userMessage) {
+            // 중복 아니면 추가 (근데 보통 중복임)
+            // 여기서는 일단 있는 그대로 둠.
+        }
+
+        // 시스템 프롬프트 추가
+        messagesForLLM.unshift({
+            role: "system",
+            content: "You are STAYnC AI, a helpful travel concierge. Answer shortly and kindly."
         });
 
-        const lastMessage = result.messages[result.messages.length - 1];
-        let aiResponseContent = lastMessage.content as string;
+        console.log(`[AI] Sending ${messagesForLLM.length} messages to OpenAI API...`);
 
-        console.log(`[AI] Generated response: ${aiResponseContent.substring(0, 50)}...`);
-
-        // 5. Typing Indicator OFF
-        await pusherServer.trigger(`room-${roomId}`, "user-typing", {
-            userId: aiUser.id,
-            userName: aiUser.name,
-            isTyping: false
+        // 5. OpenAI API 호출 (Native Fetch)
+        const response = await fetch("https://api.openai.com/v1/chat/completions", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${API_KEY}`
+            },
+            body: JSON.stringify({
+                model: "gpt-4o-mini",
+                messages: messagesForLLM,
+                temperature: 0.7
+            })
         });
+
+        if (!response.ok) {
+            const errText = await response.text();
+            console.error(`[AI] OpenAI API Error: ${response.status} - ${errText}`);
+            throw new Error("OpenAI API Failed");
+        }
+
+        const data = await response.json();
+        const aiResponseContent = data.choices[0]?.message?.content || "Sorry, I couldn't generate a response.";
+
+        console.log(`[AI] Response: ${aiResponseContent.substring(0, 50)}...`);
 
         // 6. DB 저장 (AI 메시지)
-        // JSON 응답인 경우 처리는 UI에서 담당 (마크다운 코드블록 그대로 저장)
         const aiMessage = await prisma.message.create({
             data: {
                 roomId,
@@ -165,7 +190,13 @@ async function handleAIResponse(roomId: string, userMessage: string, senderId: s
             }
         });
 
-        // 7. 실시간 전송 (Pusher)
+        // 7. Typing Indicator OFF & New Message Trigger
+        await pusherServer.trigger(`room-${roomId}`, "user-typing", {
+            userId: aiUser.id,
+            userName: aiUser.name,
+            isTyping: false
+        });
+
         await pusherServer.trigger(`room-${roomId}`, "new-message", {
             id: aiMessage.id,
             content: aiMessage.content,
