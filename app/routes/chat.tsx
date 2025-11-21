@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { type LoaderFunctionArgs, type ActionFunctionArgs, useLoaderData, useFetcher, useNavigate } from "react-router";
 import { SafeArea, AppHeader, BottomNav } from "../components/layout";
 import { getSession, requireAuth } from "~/lib/auth.server";
@@ -6,7 +6,8 @@ import { prisma } from "~/lib/db.server";
 import { ChatListItem } from "~/components/chat/chat-list-item";
 import { motion, AnimatePresence } from "framer-motion";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { Add01Icon, Delete02Icon, UserIcon } from "@hugeicons/core-free-icons";
+import { Add01Icon, Delete02Icon, UserIcon, AlertCircleIcon } from "@hugeicons/core-free-icons";
+import { toast } from "sonner";
 
 export async function loader({ request }: LoaderFunctionArgs) {
     const session = await getSession(request);
@@ -104,7 +105,7 @@ export async function action({ request }: ActionFunctionArgs) {
             await prisma.room.delete({ where: { id: roomId } });
         }
 
-        return { success: true };
+        return { success: true, actionType: "leave" };
     }
 
     return null;
@@ -112,28 +113,33 @@ export async function action({ request }: ActionFunctionArgs) {
 
 export default function ChatListPage() {
     const { user, rooms, potentialUsers } = useLoaderData<typeof loader>();
-    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isUserModalOpen, setIsUserModalOpen] = useState(false);
+    const [deleteRoomId, setDeleteRoomId] = useState<string | null>(null);
     const fetcher = useFetcher();
-    const navigate = useNavigate();
 
-    // 방 생성 완료 시 이동
-    if (fetcher.data && (fetcher.data as any).roomId) {
-        // 이미 navigate로 이동했어야 하지만 안전장치
-        // navigate(`/chat/${(fetcher.data as any).roomId}`);
-    }
+    // fetcher 응답 감지 (토스트 및 UI 처리)
+    useEffect(() => {
+        if (fetcher.state === "idle" && fetcher.data) {
+            const data = fetcher.data as any;
+            if (data.success && data.actionType === "leave") {
+                toast.success("채팅방에서 나갔습니다.");
+                setDeleteRoomId(null);
+            }
+        }
+    }, [fetcher.state, fetcher.data]);
 
     const handleCreateChat = (targetUserId: string) => {
-        setIsModalOpen(false);
+        setIsUserModalOpen(false);
         fetcher.submit(
             { intent: "createRoom", targetUserId },
             { method: "post" }
         );
     };
 
-    const handleDeleteRoom = (roomId: string) => {
-        if (!confirm("정말 이 대화방을 나가시겠습니까?")) return;
+    const confirmDeleteRoom = () => {
+        if (!deleteRoomId) return;
         fetcher.submit(
-            { intent: "leaveRoom", roomId },
+            { intent: "leaveRoom", roomId: deleteRoomId },
             { method: "post" }
         );
     };
@@ -157,20 +163,23 @@ export default function ChatListPage() {
                                 initial={{ opacity: 0 }}
                                 animate={{ opacity: 1 }}
                                 exit={{ opacity: 0, height: 0 }}
-                                className="relative group"
+                                className="relative group rounded-2xl overflow-hidden"
                             >
                                 <ChatListItem {...room} image={room.image ?? undefined} />
 
-                                {/* 삭제 버튼 (간단히 우측에 표시) */}
-                                <button
-                                    onClick={(e) => {
-                                        e.preventDefault();
-                                        handleDeleteRoom(room.id);
-                                    }}
-                                    className="absolute right-2 top-1/2 -translate-y-1/2 p-2 bg-red-500/20 text-red-500 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
-                                >
-                                    <HugeiconsIcon icon={Delete02Icon} size={18} />
-                                </button>
+                                {/* 삭제 버튼 오버레이: hover 시 날짜(우측 상단)를 가림 */}
+                                <div className="absolute top-0 right-0 bottom-0 w-20 bg-gradient-to-l from-[#1c1c1e] via-[#1c1c1e] to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center pointer-events-none group-hover:pointer-events-auto">
+                                    <button
+                                        onClick={(e) => {
+                                            e.preventDefault();
+                                            e.stopPropagation();
+                                            setDeleteRoomId(room.id);
+                                        }}
+                                        className="p-2 bg-red-500/10 hover:bg-red-500/20 text-red-500 rounded-full transition-colors"
+                                    >
+                                        <HugeiconsIcon icon={Delete02Icon} size={20} />
+                                    </button>
+                                </div>
                             </motion.div>
                         ))}
                     </AnimatePresence>
@@ -182,7 +191,7 @@ export default function ChatListPage() {
                 <motion.button
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
-                    onClick={() => setIsModalOpen(true)}
+                    onClick={() => setIsUserModalOpen(true)}
                     className="w-14 h-14 rounded-full bg-gradient-to-r from-neon-purple to-neon-blue flex items-center justify-center shadow-lg shadow-neon-purple/30 text-white"
                 >
                     <HugeiconsIcon icon={Add01Icon} size={28} strokeWidth={2} />
@@ -191,14 +200,14 @@ export default function ChatListPage() {
 
             {/* User List Modal */}
             <AnimatePresence>
-                {isModalOpen && (
+                {isUserModalOpen && (
                     <>
                         <motion.div
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
                             exit={{ opacity: 0 }}
                             className="fixed inset-0 bg-black/60 z-50 backdrop-blur-sm"
-                            onClick={() => setIsModalOpen(false)}
+                            onClick={() => setIsUserModalOpen(false)}
                         />
                         <motion.div
                             initial={{ opacity: 0, scale: 0.9, y: 20 }}
@@ -208,7 +217,7 @@ export default function ChatListPage() {
                         >
                             <div className="p-4 border-b border-white/5 flex justify-between items-center bg-white/5">
                                 <h3 className="text-lg font-bold text-white">새로운 대화</h3>
-                                <button onClick={() => setIsModalOpen(false)} className="text-sm text-zinc-400">취소</button>
+                                <button onClick={() => setIsUserModalOpen(false)} className="text-sm text-zinc-400">취소</button>
                             </div>
                             <div className="flex-1 overflow-y-auto p-2">
                                 {potentialUsers.length === 0 ? (
@@ -235,6 +244,56 @@ export default function ChatListPage() {
                                     ))
                                 )}
                             </div>
+                        </motion.div>
+                    </>
+                )}
+            </AnimatePresence>
+
+            {/* Delete Confirmation Modal */}
+            <AnimatePresence>
+                {deleteRoomId && (
+                    <>
+                        <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            className="fixed inset-0 bg-black/60 z-50 backdrop-blur-sm flex items-center justify-center p-4"
+                            onClick={() => setDeleteRoomId(null)}
+                        >
+                            <motion.div
+                                initial={{ opacity: 0, scale: 0.9 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                exit={{ opacity: 0, scale: 0.9 }}
+                                onClick={(e) => e.stopPropagation()}
+                                className="w-full max-w-sm bg-[#1c1c1e] rounded-2xl border border-white/10 overflow-hidden shadow-2xl"
+                            >
+                                <div className="p-6 flex flex-col items-center text-center space-y-4">
+                                    <div className="w-12 h-12 rounded-full bg-red-500/10 flex items-center justify-center text-red-500">
+                                        <HugeiconsIcon icon={AlertCircleIcon} size={28} />
+                                    </div>
+                                    <div>
+                                        <h3 className="text-lg font-bold text-white mb-1">채팅방 나가기</h3>
+                                        <p className="text-sm text-zinc-400">
+                                            정말 나가시겠습니까? <br />
+                                            대화 내용은 복구할 수 없습니다.
+                                        </p>
+                                    </div>
+                                    <div className="flex gap-3 w-full pt-2">
+                                        <button
+                                            onClick={() => setDeleteRoomId(null)}
+                                            className="flex-1 py-3 rounded-xl bg-zinc-800 text-white font-medium hover:bg-zinc-700 transition"
+                                        >
+                                            취소
+                                        </button>
+                                        <button
+                                            onClick={confirmDeleteRoom}
+                                            className="flex-1 py-3 rounded-xl bg-red-500 text-white font-medium hover:bg-red-600 transition"
+                                        >
+                                            나가기
+                                        </button>
+                                    </div>
+                                </div>
+                            </motion.div>
                         </motion.div>
                     </>
                 )}
