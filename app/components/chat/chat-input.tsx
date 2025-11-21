@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { cn } from "~/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
+import { hapticMedium } from "~/lib/haptic";
 
 interface ChatInputProps {
     onSend: (message: string) => void;
@@ -101,7 +102,10 @@ export function ChatInput({ onSend, onImageSelect, isLoading = false, onTyping }
 
                 {/* Plus Button (For Attachments) */}
                 <button
-                    onClick={() => fileInputRef.current?.click()}
+                    onClick={() => {
+                        hapticMedium();
+                        fileInputRef.current?.click();
+                    }}
                     className="p-2.5 rounded-full bg-white/5 text-white/60 hover:text-neon-blue hover:bg-neon-blue/10 transition-colors"
                 >
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">

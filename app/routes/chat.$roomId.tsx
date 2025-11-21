@@ -10,6 +10,7 @@ import { ScrollDownButton } from "~/components/chat/scroll-down-button";
 import { TypingIndicator } from "~/components/chat/typing-indicator";
 import { isSameDay } from "~/lib/date-utils";
 import { usePusherChannel } from "~/hooks/use-pusher";
+import { hapticLight, hapticSuccess } from "~/lib/haptic";
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
     const session = await getSession(request);
@@ -139,8 +140,10 @@ export default function ChatRoomPage() {
 
                 if (!isAtBottom) {
                     setHasNewMessage(true);
+                    hapticSuccess(); // 📩 새 메시지 수신 진동
                     return [...prev, data];
                 }
+                hapticSuccess(); // 📩 새 메시지 수신 진동
                 return [...prev, data];
             });
         },
@@ -198,6 +201,7 @@ export default function ChatRoomPage() {
         fetcher.submit(formData, { method: "post", action: "/api/messages" });
         // 전송 직후 스크롤 내리기 (낙관적 업데이트보다 빠르게 반응)
         setTimeout(() => scrollToBottom(), 50);
+        hapticLight(); // 👆 전송 버튼 햅틱
     };
 
     // 타이핑 이벤트 전송 (api.typing.ts 호출)
