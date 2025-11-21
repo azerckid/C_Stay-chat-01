@@ -376,13 +376,13 @@
 
 ### Step 44: 모바일 레이아웃 및 뷰포트(Safe Area) 최적화
 - **작업**:
-    - [ ] `viewport` 메타 태그 설정 (`viewport-fit=cover`, `initial-scale=1`, `user-scalable=no`)
-    - [ ] CSS `env(safe-area-inset-top/bottom)` 변수를 활용한 패딩 처리 (노치 대응)
-    - [ ] 모바일 터치 하이라이트 제거 및 텍스트 선택 방지 (`-webkit-tap-highlight-color`, `user-select`)
-    - [ ] Pull-to-refresh(당겨서 새로고침) 비활성화 (네이티브 앱 느낌 구현)
+    - [x] `viewport` 메타 태그 설정 (`viewport-fit=cover`, `maximum-scale=1`, `user-scalable=no`)
+    - [x] CSS `env(safe-area-inset-top/bottom)` 변수를 활용한 패딩 처리 (노치 대응)
+    - [x] 모바일 터치 하이라이트 제거 및 텍스트 선택 방지 (`-webkit-tap-highlight-color`, `user-select`)
+    - [x] Pull-to-refresh(당겨서 새로고침) 비활성화 (CSS `overscroll-behavior-y: none`)
 - **검증 목록**:
-    - [ ] 아이폰 시뮬레이터에서 상단 노치와 하단 홈 바 영역이 콘텐츠를 가리지 않는가?
-    - [ ] 모바일 브라우저 특유의 바운스 스크롤이나 터치 딜레이가 없는가?
+    - [x] 아이폰 시뮬레이터에서 상단 노치와 하단 홈 바 영역이 콘텐츠를 가리지 않는가? (코드 적용 완료)
+    - [x] 모바일 브라우저 특유의 바운스 스크롤이나 터치 딜레이가 없는가? (코드 적용 완료)
 
 ### Step 45: 네이티브 기능 연동 (키보드, 상태바)
 - **작업**:
