@@ -15,9 +15,12 @@ export async function loader({ request }: LoaderFunctionArgs) {
     if (!aiUser) {
         aiUser = await prisma.user.create({
             data: {
+                id: crypto.randomUUID(), // ID 필수 생성
                 email: AI_EMAIL,
                 name: AI_NAME,
-                avatarUrl: "https://cdn-icons-png.flaticon.com/512/4712/4712035.png",
+                avatarUrl: "https://upload.wikimedia.org/wikipedia/commons/0/04/ChatGPT_logo.svg",
+                emailVerified: true,
+                status: "ONLINE"
             }
         });
     }

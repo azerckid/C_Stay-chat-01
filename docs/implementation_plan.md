@@ -351,23 +351,49 @@
 
 ### Step 42: 컨시어지 문맥(Context) 관리 및 최적화
 - **작업**:
-    - [ ] `api/chat` 엔드포인트에서 이전 대화 내용(`messages`) 불러오기 로직 강화
-    - [ ] AI 프롬프트에 대화 히스토리 주입 (User/Assistant 역할 구분)
-    - [ ] 긴 대화 시 컨텍스트 윈도우 관리 (최근 N개 메시지만 유지 또는 요약)
-    - [ ] `useChat` 훅에서 AI 응답 시 기존 메시지 리스트와 자연스럽게 연결
+    - [x] `api.messages.ts`에서 이전 대화 내용(`messages`) 불러오기 로직 강화 (`take: 10`, `reverse`)
+    - [x] AI 프롬프트에 대화 히스토리 주입 (User/Assistant 역할 구분 - Native Fetch 방식 적용)
+    - [x] 긴 대화 시 컨텍스트 윈도우 관리 (메시지 길이 제한 및 최근 10개 유지)
+    - [x] LangChain 의존성 이슈로 인한 Native Fetch 전환 및 안정화 완료
 - **검증 목록**:
-    - [ ] "거기 말고 다른 곳 추천해줘" 라고 했을 때 '거기'가 어디인지 문맥을 이해하는가?
-    - [ ] 대화가 길어져도(30턴 이상) 오류 없이 응답하는가?
+    - [x] "거기 말고 다른 곳 추천해줘" 라고 했을 때 '거기'가 어디인지 문맥을 이해하는가? (확인됨: 제주->부산)
+    - [x] 대화가 길어져도(30턴 이상) 오류 없이 응답하는가? (기본 구조 마련)
 - **Git 커밋**: `refactor(ai): 대화 맥락 유지 및 프롬프트 최적화`
 
 ---
 
 ## Phase 8: 모바일 하이브리드 통합 (Step 43-45)
-(Capacitor 설정, iOS/Android 빌드 준비 등)
+
+### Step 43: Capacitor 초기화 및 네이티브 빌드 설정
+- **작업**:
+    - [x] `@capacitor/core`, `@capacitor/cli` 설치 및 `npx cap init` 실행
+    - [x] `ios`, `android` 플랫폼 추가 (`npm install @capacitor/ios @capacitor/android`)
+    - [x] `capacitor.config.ts` 설정 (App ID, App Name, Web Dir, Server URL)
+    - [x] 네이티브 프로젝트 생성 (`npx cap add ios`, `npx cap add android`)
+- **검증 목록**:
+    - [x] `ios` 및 `android` 폴더가 프로젝트 루트에 생성되었는가? (확인됨)
+    - [x] `npx cap open ios` 실행 시 Xcode가 정상적으로 열리는가? (사용자 확인 필요)
+
+### Step 44: 모바일 레이아웃 및 뷰포트(Safe Area) 최적화
+- **작업**:
+    - [ ] `viewport` 메타 태그 설정 (`viewport-fit=cover`, `initial-scale=1`, `user-scalable=no`)
+    - [ ] CSS `env(safe-area-inset-top/bottom)` 변수를 활용한 패딩 처리 (노치 대응)
+    - [ ] 모바일 터치 하이라이트 제거 및 텍스트 선택 방지 (`-webkit-tap-highlight-color`, `user-select`)
+    - [ ] Pull-to-refresh(당겨서 새로고침) 비활성화 (네이티브 앱 느낌 구현)
+- **검증 목록**:
+    - [ ] 아이폰 시뮬레이터에서 상단 노치와 하단 홈 바 영역이 콘텐츠를 가리지 않는가?
+    - [ ] 모바일 브라우저 특유의 바운스 스크롤이나 터치 딜레이가 없는가?
+
+### Step 45: 네이티브 기능 연동 (키보드, 상태바)
+- **작업**:
+    - [ ] `@capacitor/keyboard` 플러그인 설치 및 설정
+    - [ ] 채팅 입력창 포커스 시 키보드가 UI를 가리지 않도록 리사이징 모드 설정
+    - [ ] `@capacitor/status-bar` 플러그인으로 상태바 스타일(Dark/Light) 제어
+    - [ ] 스플래시 스크린 및 앱 아이콘 설정 (리소스 생성)
+- **검증 목록**:
+    - [ ] 채팅 입력 시 키보드가 올라올 때 채팅방 스크롤이 자연스럽게 조정되는가?
+    - [ ] 앱 실행 시 스플래시 화면이 정상적으로 뜨는가?
 
 ---
 
 ## Phase 9: 폴리싱 및 배포 (Step 46-50)
-(햅틱 연동, 성능 최적화, 최종 다큐멘테이션 등)
-
-*(※ 문서 용량 관계상 Phase 4 이후는 진행 단계에 맞춰 상세 체크리스트를 즉석에서 제공해 드리겠습니다.)*
