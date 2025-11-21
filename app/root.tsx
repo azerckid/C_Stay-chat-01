@@ -27,18 +27,21 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Meta />
         <Links />
       </head>
-      <body className="bg-background min-h-screen">
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="dark"
-          forcedTheme="dark"
-          enableSystem={false}
-          disableTransitionOnChange
-        >
-          <LoadingBar />
-          <Toaster position="top-center" richColors theme="dark" />
-          {children}
-        </ThemeProvider>
+      <body className="bg-neutral-950 min-h-screen flex justify-center items-center overflow-hidden supports-[height:100dvh]:items-stretch">
+        {/* Mobile View Container */}
+        <div className="w-full max-w-md h-[100dvh] bg-background shadow-2xl overflow-hidden relative sm:border-x sm:border-white/10">
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="dark"
+            forcedTheme="dark"
+            enableSystem={false}
+            disableTransitionOnChange
+          >
+            <LoadingBar />
+            <Toaster position="top-center" richColors theme="dark" />
+            {children}
+          </ThemeProvider>
+        </div>
         <ScrollRestoration />
         <Scripts />
       </body>
