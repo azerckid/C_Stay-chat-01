@@ -168,7 +168,7 @@ export default function ChatListPage() {
                                 <ChatListItem {...room} image={room.image ?? undefined} />
 
                                 {/* 삭제 버튼 오버레이: hover 시 날짜(우측 상단)를 가림 */}
-                                <div className="absolute top-0 right-0 bottom-0 w-20 bg-gradient-to-l from-[#1c1c1e] via-[#1c1c1e] to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center pointer-events-none group-hover:pointer-events-auto">
+                                <div className="absolute top-0 right-0 bottom-0 w-24 bg-gradient-to-l from-[#1c1c1e] from-60% to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center pl-4 pointer-events-none group-hover:pointer-events-auto">
                                     <button
                                         onClick={(e) => {
                                             e.preventDefault();
