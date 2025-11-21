@@ -10,7 +10,7 @@ function getPusherClient() {
         const cluster = import.meta.env.VITE_PUSHER_CLUSTER || "ap3";
 
         // [디버깅] 키 확인 로그
-        console.log("[Pusher Debug] API Key:", apiKey ? "Loaded" : "MISSING");
+        // Key check skipped for production logs
 
         if (!apiKey) {
             console.warn("⚠️ VITE_PUSHER_KEY is missing. Real-time features disabled.");
@@ -26,7 +26,7 @@ function getPusherClient() {
             pusherInstance = new Pusher(apiKey, {
                 cluster: cluster,
             });
-            console.log("[Pusher Debug] Instance Created ✅");
+            // Instance created
         } catch (e) {
             console.error("[Pusher Debug] Create Failed ❌", e);
         }
@@ -55,7 +55,7 @@ export function usePusherChannel(channelName: string, events: EventMap) {
         });
 
         // 1. 구독 (Subscribe)
-        console.log(`[Pusher Debug] Subscribing to channel: ${channelName} 📡`);
+        // Subscribing to channel
         const channel = pusher.subscribe(channelName);
         channelRef.current = channel;
 

@@ -67,7 +67,7 @@ export function MessageBubble({
             {!isChain ? (
                 <div className="w-8 h-8 rounded-full bg-white/10 overflow-hidden border border-white/5">
                     {senderImage ? (
-                        <img src={senderImage} alt={senderName} className="w-full h-full object-cover" />
+                        <img src={senderImage} alt={senderName} className="w-full h-full object-cover" loading="lazy" />
                     ) : (
                         <div className="w-full h-full flex items-center justify-center text-[10px] text-white/50 font-bold uppercase">
                             {senderName?.charAt(0)}
