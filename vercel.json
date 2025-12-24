@@ -1,9 +1,0 @@
-{
-    "framework": "remix",
-    "rewrites": [
-        {
-            "source": "/(.*)",
-            "destination": "/"
-        }
-    ]
-}
