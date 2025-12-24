@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "npx prisma generate && react-router typegen && vite build",
+    "build": "npx prisma generate && react-router typegen && react-router build",
     "lint": "eslint .",
     "preview": "vite preview"
   },
