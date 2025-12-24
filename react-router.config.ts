@@ -1,6 +1,8 @@
 import type { Config } from "@react-router/dev/config";
+import { vercelPreset } from "@vercel/react-router/vite";
 
 export default {
-    // SPA 모드로 설정 (Vercel에서 정적 파일 호스팅 용이)
-    ssr: false,
+    // SSR 활성화 (Vercel Preset 사용 시 필수)
+    ssr: true,
+    presets: [vercelPreset()],
 } satisfies Config;
