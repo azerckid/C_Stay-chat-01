@@ -54,8 +54,23 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
     // 3. 방이 없으면 생성
     if (!targetRoomId) {
+        // 기존 앱 호환성을 위해 Conversation도 같이 생성 (ID 공유)
+        const newRoomId = crypto.randomUUID();
+
+        try {
+            await prisma.conversation.create({
+                data: {
+                    id: newRoomId,
+                    title: "Concierge Chat" // Remote DB: NOT NULL
+                }
+            });
+        } catch (e) {
+            console.log("Failed to create conversation (might exist or table missing):", e);
+        }
+
         const newRoom = await prisma.room.create({
             data: {
+                id: newRoomId,
                 name: "STAYnC Concierge",
                 members: {
                     create: [
@@ -73,7 +88,8 @@ export async function loader({ request }: LoaderFunctionArgs) {
                 senderId: aiUser.id,
                 content: "안녕하세요! 여행 계획을 도와드리는 AI 컨시어지입니다. 무엇을 도와드릴까요? ✈️",
                 type: "TEXT",
-                role: "assistant"
+                role: "assistant",
+                conversationId: newRoom.id // 기존 앱 호환성
             }
         });
 

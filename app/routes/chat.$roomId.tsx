@@ -287,7 +287,7 @@ export default function ChatRoomPage() {
                                 content={msg.content}
                                 isMe={msg.senderId === user.id}
                                 createdAt={msg.createdAt}
-                                senderName={msg.sender.name}
+                                senderName={msg.sender.name || undefined}
                                 senderImage={msg.sender.image || undefined}
                                 type={msg.type as any}
                                 isChain={isChain}

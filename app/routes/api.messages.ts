@@ -27,12 +27,29 @@ export async function action({ request }: ActionFunctionArgs) {
         }
 
         // 2. 메시지 저장
+        // 안전장치: Conversation 존재 여부 확인 및 생성 (기존 앱 호환성)
+        try {
+            const conversation = await prisma.conversation.findUnique({ where: { id: roomId } });
+            if (!conversation) {
+                await prisma.conversation.create({
+                    data: {
+                        id: roomId,
+                        title: "Chat Room" // Remote DB: NOT NULL
+                    }
+                });
+            }
+        } catch (e) {
+            console.log("Conversation check/create failed:", e);
+        }
+
         const newMessage = await prisma.message.create({
             data: {
                 roomId,
                 senderId: user.id,
                 content,
-                type
+                type,
+                role: "user",
+                conversationId: roomId // 기존 앱 호환성
             },
             include: {
                 sender: { select: { id: true, name: true, image: true, avatarUrl: true } }
@@ -183,7 +200,9 @@ async function handleAIResponse(roomId: string, userMessage: string, senderId: s
                 roomId,
                 senderId: aiUser!.id,
                 content: aiResponseContent,
-                type: "TEXT"
+                type: "TEXT",
+                role: "assistant",
+                conversationId: roomId // 기존 앱 호환성
             },
             include: {
                 sender: { select: { id: true, name: true, image: true, avatarUrl: true } }

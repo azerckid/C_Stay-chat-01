@@ -231,9 +231,9 @@ export default function ChatListPage() {
                                         >
                                             <div className="w-10 h-10 rounded-full bg-zinc-700 overflow-hidden flex items-center justify-center">
                                                 {u.avatarUrl ? (
-                                                    <img src={u.avatarUrl} alt={u.name} className="w-full h-full object-cover" />
+                                                    <img src={u.avatarUrl} alt={u.name || undefined} className="w-full h-full object-cover" />
                                                 ) : (
-                                                    <span className="text-xs text-white/50">{u.name.charAt(0)}</span>
+                                                    <span className="text-xs text-white/50">{(u.name || "U").charAt(0)}</span>
                                                 )}
                                             </div>
                                             <div>
