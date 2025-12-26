@@ -1,0 +1,373 @@
+{
+  "buildManifest": {
+    "serverBundles": {
+      "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0": {
+        "id": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+        "file": "build/server/nodejs_eyJydW50aW1lIjoibm9kZWpzIn0/index.js",
+        "config": {
+          "runtime": "nodejs"
+        }
+      }
+    },
+    "routeIdToServerBundleId": {
+      "routes/home": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "chat": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "chat-room": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "api-rooms": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/api.messages": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/api.upload": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/api.typing": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/api.read": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "api-room-messages": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "concierge": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "login": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "profile": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "auth-google-callback": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "auth-kakao-callback": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "auth-splat": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0"
+    },
+    "routes": {
+      "root": {
+        "id": "root",
+        "file": "app/root.tsx",
+        "path": "",
+        "config": {}
+      },
+      "routes/home": {
+        "id": "routes/home",
+        "parentId": "root",
+        "file": "app/routes/home.tsx",
+        "index": true,
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "chat": {
+        "id": "chat",
+        "parentId": "root",
+        "file": "app/routes/chat.tsx",
+        "path": "chat",
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "chat-room": {
+        "id": "chat-room",
+        "parentId": "root",
+        "file": "app/routes/chat.$roomId.tsx",
+        "path": "chat/:roomId",
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "api-rooms": {
+        "id": "api-rooms",
+        "parentId": "root",
+        "file": "app/routes/api.rooms.ts",
+        "path": "api/rooms",
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "routes/api.messages": {
+        "id": "routes/api.messages",
+        "parentId": "root",
+        "file": "app/routes/api.messages.ts",
+        "path": "api/messages",
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "routes/api.upload": {
+        "id": "routes/api.upload",
+        "parentId": "root",
+        "file": "app/routes/api.upload.ts",
+        "path": "api/upload",
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "routes/api.typing": {
+        "id": "routes/api.typing",
+        "parentId": "root",
+        "file": "app/routes/api.typing.ts",
+        "path": "api/typing",
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "routes/api.read": {
+        "id": "routes/api.read",
+        "parentId": "root",
+        "file": "app/routes/api.read.ts",
+        "path": "api/read",
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "api-room-messages": {
+        "id": "api-room-messages",
+        "parentId": "root",
+        "file": "app/routes/api.rooms.$roomId.messages.ts",
+        "path": "api/rooms/:roomId/messages",
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "concierge": {
+        "id": "concierge",
+        "parentId": "root",
+        "file": "app/routes/concierge.tsx",
+        "path": "concierge",
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "login": {
+        "id": "login",
+        "parentId": "root",
+        "file": "app/routes/login.tsx",
+        "path": "login",
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "profile": {
+        "id": "profile",
+        "parentId": "root",
+        "file": "app/routes/profile.tsx",
+        "path": "profile",
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "auth-google-callback": {
+        "id": "auth-google-callback",
+        "parentId": "root",
+        "file": "app/routes/auth/google/callback.ts",
+        "path": "auth/google/callback",
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "auth-kakao-callback": {
+        "id": "auth-kakao-callback",
+        "parentId": "root",
+        "file": "app/routes/auth/kakao/callback.ts",
+        "path": "auth/kakao/callback",
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "auth-splat": {
+        "id": "auth-splat",
+        "parentId": "root",
+        "file": "app/routes/auth/$.ts",
+        "path": "auth/*",
+        "config": {
+          "runtime": "nodejs"
+        }
+      }
+    }
+  },
+  "reactRouterConfig": {
+    "appDirectory": "/Users/namhyeongseog/Desktop/TODO/STAYnC/STAYnC-chat/app",
+    "basename": "/",
+    "buildDirectory": "/Users/namhyeongseog/Desktop/TODO/STAYnC/STAYnC-chat/build",
+    "future": {
+      "unstable_optimizeDeps": false,
+      "unstable_subResourceIntegrity": false,
+      "v8_middleware": false,
+      "v8_splitRouteModules": false,
+      "v8_viteEnvironmentApi": false
+    },
+    "routes": {
+      "root": {
+        "id": "root",
+        "file": "root.tsx",
+        "path": ""
+      },
+      "routes/home": {
+        "id": "routes/home",
+        "parentId": "root",
+        "file": "routes/home.tsx",
+        "index": true
+      },
+      "chat": {
+        "id": "chat",
+        "parentId": "root",
+        "file": "routes/chat.tsx",
+        "path": "chat"
+      },
+      "chat-room": {
+        "id": "chat-room",
+        "parentId": "root",
+        "file": "routes/chat.$roomId.tsx",
+        "path": "chat/:roomId"
+      },
+      "api-rooms": {
+        "id": "api-rooms",
+        "parentId": "root",
+        "file": "routes/api.rooms.ts",
+        "path": "api/rooms"
+      },
+      "routes/api.messages": {
+        "id": "routes/api.messages",
+        "parentId": "root",
+        "file": "routes/api.messages.ts",
+        "path": "api/messages"
+      },
+      "routes/api.upload": {
+        "id": "routes/api.upload",
+        "parentId": "root",
+        "file": "routes/api.upload.ts",
+        "path": "api/upload"
+      },
+      "routes/api.typing": {
+        "id": "routes/api.typing",
+        "parentId": "root",
+        "file": "routes/api.typing.ts",
+        "path": "api/typing"
+      },
+      "routes/api.read": {
+        "id": "routes/api.read",
+        "parentId": "root",
+        "file": "routes/api.read.ts",
+        "path": "api/read"
+      },
+      "api-room-messages": {
+        "id": "api-room-messages",
+        "parentId": "root",
+        "file": "routes/api.rooms.$roomId.messages.ts",
+        "path": "api/rooms/:roomId/messages"
+      },
+      "concierge": {
+        "id": "concierge",
+        "parentId": "root",
+        "file": "routes/concierge.tsx",
+        "path": "concierge"
+      },
+      "login": {
+        "id": "login",
+        "parentId": "root",
+        "file": "routes/login.tsx",
+        "path": "login"
+      },
+      "profile": {
+        "id": "profile",
+        "parentId": "root",
+        "file": "routes/profile.tsx",
+        "path": "profile"
+      },
+      "auth-google-callback": {
+        "id": "auth-google-callback",
+        "parentId": "root",
+        "file": "routes/auth/google/callback.ts",
+        "path": "auth/google/callback"
+      },
+      "auth-kakao-callback": {
+        "id": "auth-kakao-callback",
+        "parentId": "root",
+        "file": "routes/auth/kakao/callback.ts",
+        "path": "auth/kakao/callback"
+      },
+      "auth-splat": {
+        "id": "auth-splat",
+        "parentId": "root",
+        "file": "routes/auth/$.ts",
+        "path": "auth/*"
+      }
+    },
+    "routeDiscovery": {
+      "mode": "lazy",
+      "manifestPath": "/__manifest"
+    },
+    "serverBuildFile": "index.js",
+    "serverModuleFormat": "esm",
+    "ssr": true,
+    "unstable_routeConfig": [
+      {
+        "id": "root",
+        "path": "",
+        "file": "root.tsx",
+        "children": [
+          {
+            "file": "routes/home.tsx",
+            "index": true
+          },
+          {
+            "file": "routes/chat.tsx",
+            "path": "chat",
+            "id": "chat"
+          },
+          {
+            "file": "routes/chat.$roomId.tsx",
+            "path": "chat/:roomId",
+            "id": "chat-room"
+          },
+          {
+            "file": "routes/api.rooms.ts",
+            "path": "api/rooms",
+            "id": "api-rooms"
+          },
+          {
+            "file": "routes/api.messages.ts",
+            "path": "api/messages"
+          },
+          {
+            "file": "routes/api.upload.ts",
+            "path": "api/upload"
+          },
+          {
+            "file": "routes/api.typing.ts",
+            "path": "api/typing"
+          },
+          {
+            "file": "routes/api.read.ts",
+            "path": "api/read"
+          },
+          {
+            "file": "routes/api.rooms.$roomId.messages.ts",
+            "path": "api/rooms/:roomId/messages",
+            "id": "api-room-messages"
+          },
+          {
+            "file": "routes/concierge.tsx",
+            "path": "concierge",
+            "id": "concierge"
+          },
+          {
+            "file": "routes/login.tsx",
+            "path": "login",
+            "id": "login"
+          },
+          {
+            "file": "routes/profile.tsx",
+            "path": "profile",
+            "id": "profile"
+          },
+          {
+            "file": "routes/auth/google/callback.ts",
+            "path": "auth/google/callback",
+            "id": "auth-google-callback"
+          },
+          {
+            "file": "routes/auth/kakao/callback.ts",
+            "path": "auth/kakao/callback",
+            "id": "auth-kakao-callback"
+          },
+          {
+            "file": "routes/auth/$.ts",
+            "path": "auth/*",
+            "id": "auth-splat"
+          }
+        ]
+      }
+    ]
+  },
+  "viteConfig": {
+    "build": {
+      "assetsDir": "assets"
+    }
+  }
+}
