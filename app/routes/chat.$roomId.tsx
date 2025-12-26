@@ -74,6 +74,9 @@ export default function ChatRoomPage() {
     // 🔥 Optimistic Typing: 내가 메시지를 보내면 AI가 쓰고 있다고 가정
     const [isOptimisticTyping, setIsOptimisticTyping] = useState(false);
 
+    // 🔥 AI인지 확인 (일반 채팅 격리)
+    const isAiChat = partner?.email === "ai@staync.com";
+
     // Loader 데이터가 갱신되면 상태 동기화 (Pusher가 없어도 메시지 목록 최신화)
     useEffect(() => {
         setMessages(initialMessages);
@@ -223,8 +226,10 @@ export default function ChatRoomPage() {
         formData.append("roomId", room.id); // API에 roomId 전달 필수
         fetcher.submit(formData, { method: "post", action: "/api/messages" });
 
-        // 🔥 전송 즉시 낙관적 타이핑 시작! (기다리지 않음)
-        setIsOptimisticTyping(true);
+        // 🔥 전송 즉시 낙관적 타이핑 시작! (단, AI 채팅일 때만)
+        if (isAiChat) {
+            setIsOptimisticTyping(true);
+        }
 
         // 전송 직후 스크롤 내리기 (낙관적 업데이트보다 빠르게 반응)
         setTimeout(() => scrollToBottom(), 50);
@@ -270,8 +275,10 @@ export default function ChatRoomPage() {
 
             fetcher.submit(formData, { method: "post", action: "/api/messages" });
 
-            // 이미지도 보내면 AI가 본다고 가정
-            setIsOptimisticTyping(true);
+            // 이미지도 보내면 AI가 본다고 가정 (AI 채팅일 때만)
+            if (isAiChat) {
+                setIsOptimisticTyping(true);
+            }
 
             setTimeout(() => scrollToBottom(), 50);
 
