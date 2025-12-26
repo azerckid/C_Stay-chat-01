@@ -72,7 +72,8 @@ export async function loader({ request }: LoaderFunctionArgs) {
                 roomId: newRoom.id,
                 senderId: aiUser.id,
                 content: "안녕하세요! 여행 계획을 도와드리는 AI 컨시어지입니다. 무엇을 도와드릴까요? ✈️",
-                type: "TEXT"
+                type: "TEXT",
+                role: "assistant"
             }
         });
 

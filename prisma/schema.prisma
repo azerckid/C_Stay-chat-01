@@ -112,6 +112,7 @@ model Message {
   roomId    String
   createdAt DateTime @default(now())
   read      Boolean  @default(false)
+  role      String   @default("user") // user, assistant, system
 
   sender User @relation(fields: [senderId], references: [id], onDelete: Cascade)
   room   Room @relation(fields: [roomId], references: [id], onDelete: Cascade)
