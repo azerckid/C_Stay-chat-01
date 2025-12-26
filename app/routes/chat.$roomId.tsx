@@ -71,12 +71,16 @@ export default function ChatRoomPage() {
     const [typingUsers, setTypingUsers] = useState<Set<string>>(new Set());
     const typingFetcher = useFetcher(); // 타이핑 전송용 별도 fetcher
 
+    // 🔥 Optimistic Typing: 내가 메시지를 보내면 AI가 쓰고 있다고 가정
+    const [isOptimisticTyping, setIsOptimisticTyping] = useState(false);
+
     // Loader 데이터가 갱신되면 상태 동기화 (Pusher가 없어도 메시지 목록 최신화)
     useEffect(() => {
         setMessages(initialMessages);
+        setIsOptimisticTyping(false); // 로더 갱신(새로고침 등) 되면 일단 끔
     }, [initialMessages]);
 
-    // 스크롤 핸들러 (위치 감지)
+    // 스크롤 핸들러 (위치 감지) - flex column 이슈 해결을 위해 h-full 대신 flex-1 사용
     const handleScroll = () => {
         if (!scrollRef.current) return;
         const { scrollTop, scrollHeight, clientHeight } = scrollRef.current;
@@ -93,10 +97,13 @@ export default function ChatRoomPage() {
 
     const scrollToBottom = (smooth = true) => {
         if (scrollRef.current) {
-            scrollRef.current.scrollTo({
-                top: scrollRef.current.scrollHeight,
-                behavior: smooth ? "smooth" : "auto"
-            });
+            // 약간의 딜레이를 주어 렌더링 후 스크롤
+            setTimeout(() => {
+                scrollRef.current?.scrollTo({
+                    top: scrollRef.current.scrollHeight,
+                    behavior: smooth ? "smooth" : "auto"
+                });
+            }, 50);
             setHasNewMessage(false);
         }
     };
@@ -118,6 +125,10 @@ export default function ChatRoomPage() {
         if (isAtBottom && messages.length > 0) {
             markAsRead();
         }
+        // 메시지가 추가되면(특히 AI 답변) 낙관적 타이핑 해제
+        if (messages.length > initialMessages.length) {
+            setIsOptimisticTyping(false);
+        }
     }, [messages, isAtBottom, room.id]);
 
     // ✅ Real-time Hook 사용 (Clean & Professional)
@@ -126,6 +137,11 @@ export default function ChatRoomPage() {
             setMessages((prev) => {
                 // 중복 방지
                 if (prev.find(m => m.id === data.id)) return prev;
+
+                // AI 답변이 오면 낙관적 타이핑 해제
+                if (data.senderId !== user.id) {
+                    setIsOptimisticTyping(false);
+                }
 
                 setTypingUsers(prevSet => {
                     const newSet = new Set(prevSet);
@@ -149,6 +165,13 @@ export default function ChatRoomPage() {
         },
         "user-typing": (data: { userId: string; isTyping: boolean }) => {
             if (String(data.userId) === String(user.id)) return;
+
+            // 이미 낙관적 타이핑 중이면 서버 이벤트 무시 (깜빡임 방지)
+            // 🔥 Fix: 서버에서 'isTyping: true'가 와도 낙관적 상태를 끄지 않습니다.
+            // 낙관적 상태는 오직 "새 메시지 도착(답변 완료)" 또는 "타이핑 멈춤(false)" 신호에만 끕니다.
+            if (!data.isTyping) {
+                setIsOptimisticTyping(false);
+            }
 
             setTypingUsers(prev => {
                 const newSet = new Set(prev);
@@ -199,6 +222,10 @@ export default function ChatRoomPage() {
         formData.append("content", text);
         formData.append("roomId", room.id); // API에 roomId 전달 필수
         fetcher.submit(formData, { method: "post", action: "/api/messages" });
+
+        // 🔥 전송 즉시 낙관적 타이핑 시작! (기다리지 않음)
+        setIsOptimisticTyping(true);
+
         // 전송 직후 스크롤 내리기 (낙관적 업데이트보다 빠르게 반응)
         setTimeout(() => scrollToBottom(), 50);
         hapticLight(); // 👆 전송 버튼 햅틱
@@ -212,6 +239,8 @@ export default function ChatRoomPage() {
         // 메인 fetcher와 분리된 typingFetcher 사용
         typingFetcher.submit(formData, { method: "post", action: "/api/typing" });
     };
+
+    // ... handleImageSelect 생략 ...
 
     const handleImageSelect = async (file: File) => {
         if (!file) return;
@@ -240,6 +269,10 @@ export default function ChatRoomPage() {
             formData.append("type", "IMAGE"); // 이미지 타입 명시
 
             fetcher.submit(formData, { method: "post", action: "/api/messages" });
+
+            // 이미지도 보내면 AI가 본다고 가정
+            setIsOptimisticTyping(true);
+
             setTimeout(() => scrollToBottom(), 50);
 
         } catch (error) {
@@ -251,10 +284,11 @@ export default function ChatRoomPage() {
     };
 
     // 파트너이거나 타이핑 중인 유저가 있는 경우 (안전장치 포함)
-    const isPartnerTyping = partner ? typingUsers.has(partner.id) : typingUsers.size > 0;
+    // 혹은 내가 방금 메시지를 보내서 낙관적 대기 상태인 경우
+    const isPartnerTyping = isOptimisticTyping || (partner ? typingUsers.has(partner.id) : typingUsers.size > 0);
 
     return (
-        <SafeArea className="bg-background flex flex-col h-full pt-20 relative">
+        <SafeArea className="bg-background flex flex-col h-full pt-20 relative overflow-hidden">
             <AppHeader
                 title={partner?.name || room.name || "Unknown"}
                 showBack={true}
@@ -264,7 +298,7 @@ export default function ChatRoomPage() {
             <div
                 ref={scrollRef}
                 onScroll={handleScroll}
-                className="flex-1 overflow-y-auto p-4 space-y-2 scrollbar-hide"
+                className="flex-1 overflow-y-auto p-4 space-y-2 scrollbar-hide min-h-0"
             >
                 {messages.length === 0 && (
                     <div className="text-center text-white/30 text-sm py-10">
@@ -311,7 +345,11 @@ export default function ChatRoomPage() {
                 )}
 
                 {/* ✨ Typing Indicator ✨ */}
-                <TypingIndicator isTyping={isPartnerTyping} />
+                <TypingIndicator
+                    isTyping={isPartnerTyping}
+                    partnerName={partner?.name || "상대방"}
+                    partnerImage={partner?.image || partner?.avatarUrl || undefined}
+                />
             </div>
 
             <ScrollDownButton

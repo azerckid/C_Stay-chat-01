@@ -80,6 +80,26 @@ export async function action({ request }: ActionFunctionArgs) {
         }
 
         // 5. AI 응답 처리 (비동기)
+        // 🔥 Critical: AI가 있다고 가정하고 미리 Typing Indicator를 쏩니다. (UX 향상)
+        // 실제 AI 로직 안에서 AI 유저를 찾아서 쏘려면 늦을 수 있음.
+        const AI_EMAIL = "ai@staync.com";
+        const aiUser = await prisma.user.findUnique({ where: { email: AI_EMAIL } });
+
+        if (aiUser) {
+            // AI가 이 방에 있는지 확인 (최적화)
+            const isAiInRoom = await prisma.roomMember.findFirst({
+                where: { roomId, userId: aiUser.id }
+            });
+
+            if (isAiInRoom) {
+                await pusherServer.trigger(`room-${roomId}`, "user-typing", {
+                    userId: aiUser.id,
+                    userName: aiUser.name || "AI Concierge",
+                    isTyping: true
+                });
+            }
+        }
+
         void handleAIResponse(roomId, content, user.id);
 
         return { success: true, message: newMessage };
