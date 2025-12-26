@@ -288,7 +288,7 @@ export default function ChatRoomPage() {
     const isPartnerTyping = isOptimisticTyping || (partner ? typingUsers.has(partner.id) : typingUsers.size > 0);
 
     return (
-        <SafeArea className="bg-background flex flex-col h-full pt-20 relative overflow-hidden">
+        <SafeArea className="bg-background flex flex-col h-[100dvh] max-h-[100dvh] pt-20 relative overflow-hidden">
             <AppHeader
                 title={partner?.name || room.name || "Unknown"}
                 showBack={true}
