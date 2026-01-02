@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { cn } from "~/lib/utils";
-import { motion, AnimatePresence } from "framer-motion";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { Add01Icon } from "@hugeicons/core-free-icons";
 import { hapticMedium } from "~/lib/haptic";
 
 interface ChatInputProps {
@@ -12,27 +13,12 @@ interface ChatInputProps {
 
 export function ChatInput({ onSend, onImageSelect, isLoading = false, onTyping }: ChatInputProps) {
     const [message, setMessage] = useState("");
-    const textareaRef = useRef<HTMLTextAreaElement>(null);
+    const inputRef = useRef<HTMLInputElement>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
     const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null); // 타이핑 감지 타이머
 
-    const adjustHeight = () => {
-        const textarea = textareaRef.current;
-        if (!textarea) return;
-
-        textarea.style.height = "auto";
-        const newHeight = Math.min(textarea.scrollHeight, 120);
-        textarea.style.height = `${newHeight}px`;
-    };
-
-    // Auto-resize logic (initial adjustment)
-    useEffect(() => {
-        adjustHeight();
-    }, []); // Run once on mount
-
-    const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setMessage(e.target.value);
-        adjustHeight();
 
         // 타이핑 감지 로직
         if (onTyping) {
@@ -63,14 +49,9 @@ export function ChatInput({ onSend, onImageSelect, isLoading = false, onTyping }
             typingTimeoutRef.current = null;
             if (onTyping) onTyping(false);
         }
-
-        // 높이 초기화
-        if (textareaRef.current) {
-            textareaRef.current.style.height = "auto";
-        }
     };
 
-    const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
         if (e.key === "Enter" && !e.shiftKey) {
             e.preventDefault();
             // 한글 조합 중일 때 전송 방지
@@ -89,8 +70,8 @@ export function ChatInput({ onSend, onImageSelect, isLoading = false, onTyping }
     };
 
     return (
-        <div className="p-4 bg-black/40 backdrop-blur-xl border-t border-white/10 pb-8"> {/* pb-8 for safe area */}
-            <div className="flex items-end gap-3 max-w-3xl mx-auto">
+        <div className="bg-[#f6f7f8] dark:bg-[#101c22] border-t border-gray-200 dark:border-gray-800 p-2 pb-4">
+            <div className="flex items-end gap-2 p-2">
                 {/* File Input (Hidden) */}
                 <input
                     type="file"
@@ -100,60 +81,49 @@ export function ChatInput({ onSend, onImageSelect, isLoading = false, onTyping }
                     onChange={handleFileChange}
                 />
 
-                {/* Plus Button (For Attachments) */}
+                {/* Add Button */}
                 <button
                     onClick={() => {
                         hapticMedium();
                         fileInputRef.current?.click();
                     }}
-                    className="p-2.5 rounded-full bg-white/5 text-white/60 hover:text-neon-blue hover:bg-neon-blue/10 transition-colors"
+                    className="flex items-center justify-center w-10 h-10 text-slate-500 dark:text-slate-400 hover:bg-gray-200 dark:hover:bg-[#283339] rounded-full transition-colors shrink-0"
                 >
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M5 12h14m-7-7v14" />
-                    </svg>
+                    <HugeiconsIcon icon={Add01Icon} className="text-2xl" />
                 </button>
 
                 {/* Input Area */}
-                <div className="flex-1 bg-white/5 rounded-[24px] border border-white/10 focus-within:border-neon-purple/50 focus-within:bg-white/10 transition-all overflow-hidden flex items-end">
-                    <textarea
-                        ref={textareaRef}
+                <div className="flex-1 bg-white dark:bg-[#283339] rounded-3xl flex items-center min-h-[44px] px-4 border border-gray-200 dark:border-transparent">
+                    <input
+                        ref={inputRef}
+                        type="text"
                         value={message}
                         onChange={handleChange}
                         onKeyDown={handleKeyDown}
-                        placeholder="메시지를 입력하세요..."
-                        className="w-full bg-transparent border-none text-white placeholder-white/30 px-5 py-3.5 focus:ring-0 max-h-[120px] resize-none scrollbar-hide font-light leading-relaxed"
-                        rows={1}
+                        placeholder="Message..."
+                        className="bg-transparent border-none outline-none text-sm w-full text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 h-10 focus:ring-0 p-0"
                         disabled={isLoading}
                     />
+                    <button className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors ml-2">
+                        <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
+                        </svg>
+                    </button>
                 </div>
 
                 {/* Send Button */}
-                <AnimatePresence>
-                    {(message.trim() || isLoading) && (
-                        <motion.button
-                            initial={{ scale: 0, opacity: 0 }}
-                            animate={{ scale: 1, opacity: 1 }}
-                            exit={{ scale: 0, opacity: 0 }}
-                            onClick={handleSend}
-                            disabled={isLoading}
-                            className={cn(
-                                "p-3 rounded-full shadow-lg shadow-neon-purple/20 transition-all",
-                                isLoading
-                                    ? "bg-white/10 text-white/50 cursor-not-allowed"
-                                    : "bg-gradient-to-tr from-neon-purple to-indigo-500 text-white hover:brightness-110 active:scale-95"
-                            )}
-                        >
-                            {isLoading ? (
-                                <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                            ) : (
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="translate-x-0.5 translate-y-px">
-                                    <line x1="22" y1="2" x2="11" y2="13"></line>
-                                    <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
-                                </svg>
-                            )}
-                        </motion.button>
+                <button
+                    onClick={handleSend}
+                    disabled={isLoading || !message.trim()}
+                    className={cn(
+                        "flex items-center justify-center w-10 h-10 bg-primary hover:bg-sky-600 rounded-full text-white shadow-md hover:shadow-lg transition-all shrink-0",
+                        (isLoading || !message.trim()) && "opacity-50 cursor-not-allowed"
                     )}
-                </AnimatePresence>
+                >
+                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" />
+                    </svg>
+                </button>
             </div>
         </div>
     );

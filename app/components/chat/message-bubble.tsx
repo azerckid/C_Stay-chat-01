@@ -1,10 +1,16 @@
 import { cn } from "~/lib/utils";
-import { motion } from "framer-motion";
 import { formatMessageTime } from "~/lib/date-utils";
 import { linkify } from "~/lib/text-utils";
 import { TimelineView } from "./timeline-view";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { CheckmarkCircle02Icon, Tick02Icon } from "@hugeicons/core-free-icons";
+import {
+    CheckmarkCircle02Icon,
+    Tick02Icon,
+    Rotate01Icon,
+    Copy01Icon,
+    Share01Icon,
+    AiChat01Icon
+} from "@hugeicons/core-free-icons";
 
 interface MessageBubbleProps {
     content: string;
@@ -17,6 +23,10 @@ interface MessageBubbleProps {
     status?: "sending" | "sent" | "error";
     read?: boolean;
     onRetry?: () => void;
+    isAi?: boolean;
+    onRegenerate?: () => void;
+    onCopy?: () => void;
+    onShare?: () => void;
 }
 
 export function MessageBubble({
@@ -29,7 +39,11 @@ export function MessageBubble({
     isChain = false,
     status = "sent",
     read = true,
-    onRetry
+    onRetry,
+    isAi = false,
+    onRegenerate,
+    onCopy,
+    onShare
 }: MessageBubbleProps) {
     // 시스템 메시지
     if (type === "SYSTEM") {
@@ -65,11 +79,11 @@ export function MessageBubble({
 
     // 아바타 렌더링 (공통)
     const avatarElement = (
-        <div className="shrink-0 w-8 h-8 rounded-full bg-center bg-no-repeat bg-cover overflow-hidden border border-gray-200 dark:border-gray-700">
+        <div className="bg-center bg-no-repeat aspect-square bg-cover rounded-full w-8 h-8 shrink-0">
             {senderImage ? (
-                <img src={senderImage} alt={senderName} className="w-full h-full object-cover" loading="lazy" />
+                <img src={senderImage} alt={senderName} className="w-full h-full rounded-full object-cover" loading="lazy" />
             ) : (
-                <div className="w-full h-full flex items-center justify-center text-[10px] text-muted-foreground font-bold uppercase bg-muted">
+                <div className="w-full h-full rounded-full flex items-center justify-center text-[10px] text-white font-bold uppercase bg-gradient-to-br from-indigo-500 to-purple-600">
                     {senderName?.charAt(0)}
                 </div>
             )}
@@ -77,20 +91,17 @@ export function MessageBubble({
     );
 
     return (
-        <motion.div
-            initial={{ opacity: 0, y: 5 }}
-            animate={{ opacity: 1, y: 0 }}
+        <div
             className={cn(
                 "flex w-full gap-3",
                 isMe ? "justify-end" : "justify-start",
-                isChain ? "mb-1" : "mb-4 mt-2"
+                isChain ? "mb-1" : "mb-4"
             )}
         >
             {/* 상대방 아바타 (왼쪽) */}
             {!isMe && avatarElement}
 
             <div className={cn("flex flex-col max-w-[75%]", isMe ? "items-end" : "items-start")}>
-
                 <div className={cn("flex flex-col", isMe ? "items-end gap-1" : "items-start gap-1")}>
                     {/* 말풍선 본문 */}
                     <div className={cn(
@@ -115,10 +126,10 @@ export function MessageBubble({
                                 <TimelineView plan={travelPlan} />
                             ) : (
                                 <div className={cn(
-                                    "px-4 py-3 rounded-2xl text-[15px] leading-relaxed break-words shadow-sm dark:shadow-none",
+                                    "px-4 py-3 rounded-2xl text-[15px] font-normal leading-relaxed break-words shadow-sm dark:shadow-none",
                                     isMe
                                         ? "bg-primary text-white"
-                                        : "bg-white dark:bg-input text-slate-800 dark:text-white",
+                                        : "bg-white dark:bg-[#283339] text-slate-800 dark:text-white",
                                     isMe && !isChain && "rounded-br-sm",
                                     !isMe && !isChain && "rounded-bl-sm",
                                     isChain && "rounded-2xl",
@@ -157,10 +168,42 @@ export function MessageBubble({
                         </span>
                     )}
                 </div>
+
+                {/* AI Context Action Chips - Stitch Design */}
+                {!isMe && isAi && type === "TEXT" && status === "sent" && (
+                    <div className="flex items-center gap-1.5 mt-2 overflow-x-auto no-scrollbar w-full pb-1">
+                        <button
+                            onClick={onRegenerate}
+                            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#283339] border border-[#3e4c54] hover:bg-[#3e4c54] active:scale-95 transition-all group shrink-0"
+                        >
+                            <HugeiconsIcon icon={Rotate01Icon} className="w-3.5 h-3.5 text-[#13a4ec] group-hover:text-white" />
+                            <span className="text-[11px] font-medium text-[#9db0b9] group-hover:text-white">Regenerate</span>
+                        </button>
+
+                        <button
+                            onClick={() => {
+                                navigator.clipboard.writeText(content);
+                                onCopy?.();
+                            }}
+                            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#283339] border border-[#3e4c54] hover:bg-[#3e4c54] active:scale-95 transition-all group shrink-0"
+                        >
+                            <HugeiconsIcon icon={Copy01Icon} className="w-3.5 h-3.5 text-[#9db0b9] group-hover:text-white" />
+                            <span className="text-[11px] font-medium text-[#9db0b9] group-hover:text-white">Copy</span>
+                        </button>
+
+                        <button
+                            onClick={onShare}
+                            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#283339] border border-[#3e4c54] hover:bg-[#3e4c54] active:scale-95 transition-all group shrink-0"
+                        >
+                            <HugeiconsIcon icon={Share01Icon} className="w-3.5 h-3.5 text-[#9db0b9] group-hover:text-white" />
+                            <span className="text-[11px] font-medium text-[#9db0b9] group-hover:text-white">Share</span>
+                        </button>
+                    </div>
+                )}
             </div>
 
-            {/* 내 아바타 (오른쪽) */}
-            {isMe && avatarElement}
-        </motion.div>
+            {/* 내 아바타 (오른쪽) - Stitch Design에서는 내 아바타를 표시하지 않음 */}
+            {/* {isMe && avatarElement} */}
+        </div>
     );
 }

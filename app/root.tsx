@@ -12,8 +12,6 @@ import { ThemeProvider } from "./components/theme-provider";
 import "@fontsource-variable/outfit";
 import "@fontsource-variable/inter";
 import "./app.css";
-import { PageTransition, LoadingBar, SplashScreen } from "./components/layout";
-import { useState, useEffect } from "react";
 import { Toaster } from "sonner";
 
 export const links: Route.LinksFunction = () => [];
@@ -37,7 +35,6 @@ export function Layout({ children }: { children: React.ReactNode }) {
             enableSystem={false}
             disableTransitionOnChange
           >
-            <LoadingBar />
             <Toaster position="top-center" richColors theme="dark" />
             {children}
           </ThemeProvider>
@@ -50,18 +47,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
 }
 
 export default function App() {
-  const [showSplash, setShowSplash] = useState(true);
-
-  return (
-    <>
-      <SplashScreen onFinish={() => setShowSplash(false)} />
-      {!showSplash && (
-        <PageTransition>
-          <Outlet />
-        </PageTransition>
-      )}
-    </>
-  );
+  return <Outlet />;
 }
 
 export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {

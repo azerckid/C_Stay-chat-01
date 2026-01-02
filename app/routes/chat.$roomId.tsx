@@ -1,6 +1,6 @@
 import { useRef, useEffect, useState } from "react";
 import { type LoaderFunctionArgs, type ActionFunctionArgs, useLoaderData, useFetcher, useNavigate, useRevalidator } from "react-router";
-import { SafeArea, AppHeader } from "../components/layout";
+import { SafeArea, BottomNav } from "../components/layout";
 import { getSession, requireAuth } from "~/lib/auth.server";
 import { prisma } from "~/lib/db.server";
 import { MessageBubble } from "~/components/chat/message-bubble";
@@ -11,6 +11,8 @@ import { TypingIndicator } from "~/components/chat/typing-indicator";
 import { isSameDay } from "~/lib/date-utils";
 import { usePusherChannel } from "~/hooks/use-pusher";
 import { hapticLight, hapticSuccess } from "~/lib/haptic";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { ArrowLeft01Icon } from "@hugeicons/core-free-icons";
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
     const session = await getSession(request);
@@ -51,8 +53,6 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     };
 }
 
-
-
 export default function ChatRoomPage() {
     const { user, room, partner, initialMessages } = useLoaderData<typeof loader>();
     const [messages, setMessages] = useState(initialMessages);
@@ -75,7 +75,11 @@ export default function ChatRoomPage() {
     const [isOptimisticTyping, setIsOptimisticTyping] = useState(false);
 
     // 🔥 AI인지 확인 (일반 채팅 격리)
-    const isAiChat = partner?.email === "ai@staync.com";
+    // 파트너 이름이나 이메일에 'ai' 또는 'concierge'가 포함되어 있는지 확인하여 더 유연하게 대응
+    const isAiChat = partner?.email === "ai@staync.com" ||
+        partner?.name?.toLowerCase().includes("ai") ||
+        partner?.name?.toLowerCase().includes("concierge") ||
+        room.name?.toLowerCase().includes("concierge");
 
     // Loader 데이터가 갱신되면 상태 동기화 (Pusher가 없어도 메시지 목록 최신화)
     useEffect(() => {
@@ -245,8 +249,6 @@ export default function ChatRoomPage() {
         typingFetcher.submit(formData, { method: "post", action: "/api/typing" });
     };
 
-    // ... handleImageSelect 생략 ...
-
     const handleImageSelect = async (file: File) => {
         if (!file) return;
         setIsUploading(true);
@@ -295,20 +297,61 @@ export default function ChatRoomPage() {
     const isPartnerTyping = isOptimisticTyping || (partner ? typingUsers.has(partner.id) : typingUsers.size > 0);
 
     return (
-        <SafeArea className="bg-background flex flex-col h-[100dvh] max-h-[100dvh] pt-20 relative overflow-hidden">
-            <AppHeader
-                title={partner?.name || room.name || "Unknown"}
-                showBack={true}
-                onBack={() => navigate("/chat")}
-            />
+        <SafeArea className="bg-[#f6f7f8] dark:bg-[#101c22] flex flex-col h-[100dvh] max-h-[100dvh] relative overflow-hidden">
+            {/* Header - Stitch Design */}
+            <header className="flex items-center justify-between px-4 py-3 bg-[#f6f7f8] dark:bg-[#101c22] border-b border-gray-200 dark:border-gray-800 z-10">
+                <div className="flex items-center gap-3">
+                    <button
+                        onClick={() => navigate("/chat")}
+                        className="flex items-center justify-center text-slate-500 dark:text-slate-400 hover:text-primary transition-colors"
+                    >
+                        <HugeiconsIcon icon={ArrowLeft01Icon} className="w-6 h-6" />
+                    </button>
+                    <div className="relative">
+                        <div className="w-10 h-10 rounded-full bg-cover bg-center border border-gray-200 dark:border-gray-700 overflow-hidden">
+                            {partner?.image || partner?.avatarUrl ? (
+                                <img
+                                    src={partner.image || partner.avatarUrl}
+                                    alt={partner.name || "User"}
+                                    className="w-full h-full object-cover"
+                                />
+                            ) : (
+                                <div className="w-full h-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold">
+                                    {(partner?.name || "U").charAt(0).toUpperCase()}
+                                </div>
+                            )}
+                        </div>
+                        <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white dark:border-[#101c22] rounded-full" />
+                    </div>
+                    <div className="flex flex-col">
+                        <h2 className="text-base font-bold leading-tight tracking-tight text-slate-900 dark:text-white">
+                            {partner?.name || room.name || "Unknown"}
+                        </h2>
+                        <span className="text-xs text-slate-500 dark:text-[#9db0b9]">Active now</span>
+                    </div>
+                </div>
+                <div className="flex items-center gap-4">
+                    <button className="flex items-center justify-center text-slate-500 dark:text-slate-400 hover:text-primary transition-colors">
+                        <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M17 10.5V7a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h12a1 1 0 001-1v-3.5l4 4v-11l-4 4z" />
+                        </svg>
+                    </button>
+                    <button className="flex items-center justify-center text-slate-500 dark:text-slate-400 hover:text-primary transition-colors">
+                        <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z" />
+                        </svg>
+                    </button>
+                </div>
+            </header>
 
-            <div
+            {/* Chat Area */}
+            <main
                 ref={scrollRef}
                 onScroll={handleScroll}
-                className="flex-1 overflow-y-auto p-4 space-y-2 scrollbar-hide min-h-0"
+                className="flex-1 overflow-y-auto px-4 py-2 scroll-smooth"
             >
                 {messages.length === 0 && (
-                    <div className="text-center text-white/30 text-sm py-10">
+                    <div className="text-center text-slate-400 dark:text-[#9db0b9] text-sm py-10">
                         대화가 없습니다.
                     </div>
                 )}
@@ -333,6 +376,7 @@ export default function ChatRoomPage() {
                                 type={msg.type as any}
                                 isChain={isChain}
                                 read={(msg as any).read}
+                                isAi={isAiChat}
                             />
                         </div>
                     );
@@ -357,7 +401,10 @@ export default function ChatRoomPage() {
                     partnerName={partner?.name || "상대방"}
                     partnerImage={partner?.image || partner?.avatarUrl || undefined}
                 />
-            </div>
+
+                {/* Spacer for visibility behind sticky input */}
+                <div className="h-4" />
+            </main>
 
             <ScrollDownButton
                 show={showScrollButton}
@@ -365,12 +412,16 @@ export default function ChatRoomPage() {
                 hasNewMessage={hasNewMessage}
             />
 
-            <ChatInput
-                onSend={handleSend}
-                onImageSelect={handleImageSelect}
-                isLoading={fetcher.state === "submitting" || isUploading}
-                onTyping={handleStreamingTyping}
-            />
+            <div className="relative z-30 bg-[#f6f7f8] dark:bg-[#101c22] pb-[calc(env(safe-area-inset-bottom)+76px)]">
+                <ChatInput
+                    onSend={handleSend}
+                    onImageSelect={handleImageSelect}
+                    isLoading={fetcher.state === "submitting" || isUploading}
+                    onTyping={handleStreamingTyping}
+                />
+            </div>
+
+            <BottomNav />
         </SafeArea>
     );
 }

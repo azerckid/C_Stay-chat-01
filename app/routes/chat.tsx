@@ -183,6 +183,59 @@ export default function ChatListPage() {
 
             {/* Main Content */}
             <main className="flex-1 overflow-y-auto no-scrollbar px-4 pb-20 space-y-3">
+                {/* Favorites Section */}
+                {!searchQuery && (
+                    <div className="mb-4 pt-2">
+                        <h2 className="px-2 text-xs font-semibold text-[#6B7280] dark:text-[#9CA3AF] uppercase tracking-wider mb-3">
+                            Favorites
+                        </h2>
+                        <div className="flex space-x-4 overflow-x-auto no-scrollbar pb-2 px-2">
+                            {rooms.slice(0, 3).map((room, index) => {
+                                const isFirst = index === 0;
+                                return (
+                                    <div
+                                        key={room.id}
+                                        onClick={() => navigate(`/chat/${room.id}`)}
+                                        className="flex flex-col items-center space-y-1 min-w-[64px] cursor-pointer"
+                                    >
+                                        <div className="relative">
+                                            {room.image ? (
+                                                <img
+                                                    alt={room.title}
+                                                    className={`w-16 h-16 rounded-full object-cover border-2 p-0.5 ${isFirst ? "border-primary" : "border-transparent"}`}
+                                                    src={room.image}
+                                                />
+                                            ) : (
+                                                <div className={`w-16 h-16 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold text-lg border-2 p-0.5 ${isFirst ? "border-primary" : "border-transparent"}`}>
+                                                    {room.title.charAt(0).toUpperCase()}
+                                                </div>
+                                            )}
+                                            <div className="absolute bottom-0 right-0 w-4 h-4 bg-green-500 border-2 border-white dark:border-[#111827] rounded-full" />
+                                        </div>
+                                        <span className="text-xs font-medium text-[#111827] dark:text-[#F9FAFB] truncate w-16 text-center">
+                                            {room.title.split(" ")[0]}
+                                        </span>
+                                    </div>
+                                );
+                            })}
+                            <div
+                                onClick={() => setIsUserModalOpen(true)}
+                                className="flex flex-col items-center space-y-1 min-w-[64px] cursor-pointer"
+                            >
+                                <div className="relative">
+                                    <div className="w-16 h-16 rounded-full bg-white dark:bg-[#1F2937] flex items-center justify-center border-2 border-dashed border-gray-300 dark:border-gray-600 text-gray-400 hover:border-primary hover:text-primary transition-colors">
+                                        <HugeiconsIcon icon={Add01Icon} className="w-6 h-6" />
+                                    </div>
+                                </div>
+                                <span className="text-xs font-medium text-[#6B7280] dark:text-[#9CA3AF] truncate w-16 text-center">
+                                    Add New
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {/* Recent Messages Section */}
                 {filteredRooms.length === 0 ? (
                     <div className="h-full flex flex-col items-center justify-center text-center space-y-4 opacity-70 mt-20">
                         <p className="text-[#6B7280] dark:text-[#9CA3AF]">

@@ -95,7 +95,17 @@ export default function LoginPage() {
                     </button>
                 </div>
 
-                <div className="text-center px-6">
+                <div className="text-center px-6 space-y-4">
+                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                        Don't have an account?{" "}
+                        <button
+                            onClick={() => window.location.href = `/signup?redirectTo=${encodeURIComponent(redirectTo)}`}
+                            className="font-semibold hover:underline transition-colors"
+                            style={{ color: "#ec4899" }}
+                        >
+                            Sign Up
+                        </button>
+                    </p>
                     <p className="text-xs text-gray-400 dark:text-gray-500 leading-relaxed">
                         By continuing, you agree to our{" "}
                         <a
