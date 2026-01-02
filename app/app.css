@@ -41,7 +41,11 @@
   --color-glass-base: rgba(255, 255, 255, 0.05);
   --color-glass-border: rgba(255, 255, 255, 0.1);
 
-  /* Custom Neon Colors */
+  /* Custom Colors - Stitch Design */
+  --color-kakao: #FEE500;
+  --color-kakao-text: #3C1E1E;
+  
+  /* Legacy Neon Colors (for backward compatibility) */
   --color-neon-blue: #00D1FF;
   --color-neon-purple: #9D50FF;
   --color-neon-green: #00FF94;
@@ -113,37 +117,38 @@
   }
 
   .dark {
-    /* Deep Night Blue - #0B0F19 */
-    --background: 224 39% 7%;
-    --foreground: 210 40% 98%;
+    /* Stitch Design - Background Dark #111827 */
+    --background: 221 39% 11%;
+    --foreground: 210 20% 98%;
 
-    /* Charcoal Blue - #161B26 */
-    --card: 221 27% 12%;
-    --card-foreground: 210 40% 98%;
+    /* Stitch Design - Surface Dark #1F2937 */
+    --card: 215 28% 17%;
+    --card-foreground: 210 20% 98%;
 
-    --popover: 224 39% 7%;
-    --popover-foreground: 210 40% 98%;
+    --popover: 221 39% 11%;
+    --popover-foreground: 210 20% 98%;
 
-    /* Neon Blue - #00D1FF */
-    --primary: 191 100% 50%;
-    --primary-foreground: 224 39% 7%;
+    /* Stitch Design - Primary #13a4ec (Chat screens) */
+    --primary: 200 85% 50%;
+    --primary-foreground: 221 39% 11%;
 
-    --secondary: 221 27% 12%;
-    --secondary-foreground: 210 40% 98%;
+    --secondary: 215 28% 17%;
+    --secondary-foreground: 210 20% 98%;
 
-    --muted: 221 27% 12%;
-    --muted-foreground: 215 20.2% 65.1%;
+    /* Stitch Design - Surface Input #283339 */
+    --muted: 201 18% 19%;
+    --muted-foreground: 218 11% 65%;
 
-    /* Neon Blue Action */
-    --accent: 191 100% 50%;
-    --accent-foreground: 224 39% 7%;
+    --accent: 200 85% 50%;
+    --accent-foreground: 221 39% 11%;
 
     --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive-foreground: 210 20% 98%;
 
-    --border: 221 27% 15%;
-    --input: 221 27% 15%;
-    --ring: 191 100% 50%;
+    /* Stitch Design - Border/Input */
+    --border: 215 28% 22%;
+    --input: 201 18% 19%;
+    --ring: 200 85% 50%;
   }
 }
 
