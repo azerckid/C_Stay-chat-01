@@ -1,12 +1,12 @@
 import { useState, useEffect } from "react";
 import { type LoaderFunctionArgs, type ActionFunctionArgs, useLoaderData, useFetcher, useNavigate } from "react-router";
-import { SafeArea, AppHeader, BottomNav } from "../components/layout";
+import { SafeArea, BottomNav } from "../components/layout";
 import { getSession, requireAuth } from "~/lib/auth.server";
 import { prisma } from "~/lib/db.server";
 import { ChatListItem } from "~/components/chat/chat-list-item";
 import { motion, AnimatePresence } from "framer-motion";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { Add01Icon, Delete02Icon, UserIcon, AlertCircleIcon } from "@hugeicons/core-free-icons";
+import { Add01Icon, Delete02Icon, UserIcon, AlertCircleIcon, SearchIcon } from "@hugeicons/core-free-icons";
 import { toast } from "sonner";
 
 export async function loader({ request }: LoaderFunctionArgs) {
@@ -115,6 +115,7 @@ export default function ChatListPage() {
     const { user, rooms, potentialUsers } = useLoaderData<typeof loader>();
     const [isUserModalOpen, setIsUserModalOpen] = useState(false);
     const [deleteRoomId, setDeleteRoomId] = useState<string | null>(null);
+    const [searchQuery, setSearchQuery] = useState("");
     const fetcher = useFetcher();
 
     // fetcher 응답 감지 (토스트 및 UI 처리)
@@ -144,61 +145,89 @@ export default function ChatListPage() {
         );
     };
 
-    return (
-        <SafeArea className="bg-background">
-            <AppHeader title="Messages" showBack={false} />
+    // 검색 필터링
+    const filteredRooms = rooms.filter(room =>
+        room.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        room.lastMessage.toLowerCase().includes(searchQuery.toLowerCase())
+    );
 
-            <div className="flex-1 overflow-y-auto p-4 space-y-4 scrollbar-hide pt-20 pb-24">
-                {rooms.length === 0 ? (
+    return (
+        <SafeArea className="bg-background flex flex-col">
+            {/* Stitch Design Header */}
+            <header className="px-6 py-4 bg-background z-10 sticky top-0">
+                <div className="flex flex-col items-center justify-center space-y-4">
+                    <div className="flex flex-col items-center pt-2">
+                        <h1 className="text-2xl font-bold text-foreground tracking-tight">
+                            People Chats
+                        </h1>
+                        <p className="text-sm text-muted-foreground font-medium">
+                            Connect with friends & colleagues
+                        </p>
+                    </div>
+                    <div className="w-full relative group">
+                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <HugeiconsIcon icon={SearchIcon} className="w-5 h-5 text-muted-foreground" />
+                        </div>
+                        <input
+                            type="text"
+                            placeholder="Search conversations..."
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            className="block w-full pl-10 pr-3 py-3 border-none rounded-xl leading-5 bg-card text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary shadow-sm transition-all duration-200"
+                        />
+                    </div>
+                </div>
+            </header>
+
+            {/* Main Content */}
+            <main className="flex-1 overflow-y-auto px-4 pb-20 space-y-3">
+                {filteredRooms.length === 0 ? (
                     <div className="h-full flex flex-col items-center justify-center text-center space-y-4 opacity-70 mt-20">
-                        <p className="text-white/60">진행 중인 대화가 없습니다.</p>
-                        <p className="text-sm text-white/40">새 대화를 시작해보세요.</p>
+                        <p className="text-muted-foreground">
+                            {searchQuery ? "검색 결과가 없습니다." : "진행 중인 대화가 없습니다."}
+                        </p>
+                        <p className="text-sm text-muted-foreground/70">
+                            {searchQuery ? "다른 검색어를 시도해보세요." : "새 대화를 시작해보세요."}
+                        </p>
                     </div>
                 ) : (
-                    <AnimatePresence>
-                        {rooms.map((room) => (
-                            <motion.div
-                                key={room.id}
-                                layout
-                                initial={{ opacity: 0 }}
-                                animate={{ opacity: 1 }}
-                                exit={{ opacity: 0, height: 0 }}
-                                className="relative group rounded-2xl overflow-hidden"
-                            >
-                                <ChatListItem {...room} image={room.image ?? undefined} />
-
-                                {/* 삭제 버튼 오버레이: hover 시 날짜(우측 상단)를 가림 */}
-                                <div className="absolute top-0 right-0 bottom-0 w-24 bg-gradient-to-l from-[#1c1c1e] from-60% to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center pl-4 pointer-events-none group-hover:pointer-events-auto">
-                                    <button
-                                        onClick={(e) => {
-                                            e.preventDefault();
-                                            e.stopPropagation();
-                                            setDeleteRoomId(room.id);
-                                        }}
-                                        className="p-2 bg-red-500/10 hover:bg-red-500/20 text-red-500 rounded-full transition-colors"
+                    <>
+                        <div>
+                            <h2 className="px-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
+                                Recent Messages
+                            </h2>
+                            <AnimatePresence>
+                                {filteredRooms.map((room) => (
+                                    <motion.div
+                                        key={room.id}
+                                        layout
+                                        initial={{ opacity: 0 }}
+                                        animate={{ opacity: 1 }}
+                                        exit={{ opacity: 0, height: 0 }}
+                                        className="mb-3"
                                     >
-                                        <HugeiconsIcon icon={Delete02Icon} size={20} />
-                                    </button>
-                                </div>
-                            </motion.div>
-                        ))}
-                    </AnimatePresence>
+                                        <ChatListItem {...room} image={room.image ?? undefined} />
+                                    </motion.div>
+                                ))}
+                            </AnimatePresence>
+                        </div>
+                    </>
                 )}
-            </div>
+            </main>
 
-            {/* FAB */}
+            {/* FAB - Stitch Design */}
             <div className="fixed bottom-24 right-6 z-20">
                 <motion.button
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                     onClick={() => setIsUserModalOpen(true)}
-                    className="w-14 h-14 rounded-full bg-gradient-to-r from-neon-purple to-neon-blue flex items-center justify-center shadow-lg shadow-neon-purple/30 text-white"
+                    className="w-14 h-14 rounded-full bg-primary flex items-center justify-center shadow-lg text-primary-foreground"
                 >
                     <HugeiconsIcon icon={Add01Icon} size={28} strokeWidth={2} />
                 </motion.button>
             </div>
 
-            {/* User List Modal */}
+            {/* User List Modal - Stitch Design */}
             <AnimatePresence>
                 {isUserModalOpen && (
                     <>
@@ -213,32 +242,37 @@ export default function ChatListPage() {
                             initial={{ opacity: 0, scale: 0.9, y: 20 }}
                             animate={{ opacity: 1, scale: 1, y: 0 }}
                             exit={{ opacity: 0, scale: 0.9 }}
-                            className="fixed inset-x-4 top-[20%] max-h-[50%] bg-[#1c1c1e] z-50 rounded-2xl border border-white/10 overflow-hidden flex flex-col shadow-2xl"
+                            className="fixed inset-x-4 top-[20%] max-h-[50%] bg-card z-50 rounded-2xl border border-border overflow-hidden flex flex-col shadow-2xl"
                         >
-                            <div className="p-4 border-b border-white/5 flex justify-between items-center bg-white/5">
-                                <h3 className="text-lg font-bold text-white">새로운 대화</h3>
-                                <button onClick={() => setIsUserModalOpen(false)} className="text-sm text-zinc-400">취소</button>
+                            <div className="p-4 border-b border-border flex justify-between items-center">
+                                <h3 className="text-lg font-bold text-foreground">새로운 대화</h3>
+                                <button
+                                    onClick={() => setIsUserModalOpen(false)}
+                                    className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                                >
+                                    취소
+                                </button>
                             </div>
                             <div className="flex-1 overflow-y-auto p-2">
                                 {potentialUsers.length === 0 ? (
-                                    <div className="p-8 text-center text-zinc-500">대화 가능한 유저가 없습니다.</div>
+                                    <div className="p-8 text-center text-muted-foreground">대화 가능한 유저가 없습니다.</div>
                                 ) : (
                                     potentialUsers.map(u => (
                                         <button
                                             key={u.id}
                                             onClick={() => handleCreateChat(u.id)}
-                                            className="w-full flex items-center gap-3 p-3 hover:bg-white/5 rounded-xl transition-colors text-left"
+                                            className="w-full flex items-center gap-3 p-3 hover:bg-muted rounded-xl transition-colors text-left"
                                         >
-                                            <div className="w-10 h-10 rounded-full bg-zinc-700 overflow-hidden flex items-center justify-center">
+                                            <div className="w-10 h-10 rounded-full bg-muted overflow-hidden flex items-center justify-center">
                                                 {u.avatarUrl ? (
                                                     <img src={u.avatarUrl} alt={u.name || undefined} className="w-full h-full object-cover" />
                                                 ) : (
-                                                    <span className="text-xs text-white/50">{(u.name || "U").charAt(0)}</span>
+                                                    <span className="text-xs text-muted-foreground">{(u.name || "U").charAt(0)}</span>
                                                 )}
                                             </div>
                                             <div>
-                                                <div className="text-sm font-bold text-white">{u.name}</div>
-                                                <div className="text-xs text-zinc-500">{u.email}</div>
+                                                <div className="text-sm font-bold text-foreground">{u.name}</div>
+                                                <div className="text-xs text-muted-foreground">{u.email}</div>
                                             </div>
                                         </button>
                                     ))
@@ -249,7 +283,7 @@ export default function ChatListPage() {
                 )}
             </AnimatePresence>
 
-            {/* Delete Confirmation Modal */}
+            {/* Delete Confirmation Modal - Stitch Design */}
             <AnimatePresence>
                 {deleteRoomId && (
                     <>
@@ -265,15 +299,15 @@ export default function ChatListPage() {
                                 animate={{ opacity: 1, scale: 1 }}
                                 exit={{ opacity: 0, scale: 0.9 }}
                                 onClick={(e) => e.stopPropagation()}
-                                className="w-full max-w-sm bg-[#1c1c1e] rounded-2xl border border-white/10 overflow-hidden shadow-2xl"
+                                className="w-full max-w-sm bg-card rounded-2xl border border-border overflow-hidden shadow-2xl"
                             >
                                 <div className="p-6 flex flex-col items-center text-center space-y-4">
-                                    <div className="w-12 h-12 rounded-full bg-red-500/10 flex items-center justify-center text-red-500">
+                                    <div className="w-12 h-12 rounded-full bg-destructive/10 flex items-center justify-center text-destructive">
                                         <HugeiconsIcon icon={AlertCircleIcon} size={28} />
                                     </div>
                                     <div>
-                                        <h3 className="text-lg font-bold text-white mb-1">채팅방 나가기</h3>
-                                        <p className="text-sm text-zinc-400">
+                                        <h3 className="text-lg font-bold text-foreground mb-1">채팅방 나가기</h3>
+                                        <p className="text-sm text-muted-foreground">
                                             정말 나가시겠습니까? <br />
                                             대화 내용은 복구할 수 없습니다.
                                         </p>
@@ -281,13 +315,13 @@ export default function ChatListPage() {
                                     <div className="flex gap-3 w-full pt-2">
                                         <button
                                             onClick={() => setDeleteRoomId(null)}
-                                            className="flex-1 py-3 rounded-xl bg-zinc-800 text-white font-medium hover:bg-zinc-700 transition"
+                                            className="flex-1 py-3 rounded-xl bg-muted text-foreground font-medium hover:bg-muted/80 transition"
                                         >
                                             취소
                                         </button>
                                         <button
                                             onClick={confirmDeleteRoom}
-                                            className="flex-1 py-3 rounded-xl bg-red-500 text-white font-medium hover:bg-red-600 transition"
+                                            className="flex-1 py-3 rounded-xl bg-destructive text-destructive-foreground font-medium hover:bg-destructive/90 transition"
                                         >
                                             나가기
                                         </button>
