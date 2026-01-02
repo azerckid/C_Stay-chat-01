@@ -3,6 +3,8 @@ import { motion } from "framer-motion";
 import { formatMessageTime } from "~/lib/date-utils";
 import { linkify } from "~/lib/text-utils";
 import { TimelineView } from "./timeline-view";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { CheckmarkCircle02Icon, Tick02Icon } from "@hugeicons/core-free-icons";
 
 interface MessageBubbleProps {
     content: string;
@@ -63,19 +65,13 @@ export function MessageBubble({
 
     // 아바타 렌더링 (공통)
     const avatarElement = (
-        <div className="shrink-0 flex flex-col items-center w-8">
-            {!isChain ? (
-                <div className="w-8 h-8 rounded-full bg-white/10 overflow-hidden border border-white/5">
-                    {senderImage ? (
-                        <img src={senderImage} alt={senderName} className="w-full h-full object-cover" loading="lazy" />
-                    ) : (
-                        <div className="w-full h-full flex items-center justify-center text-[10px] text-white/50 font-bold uppercase">
-                            {senderName?.charAt(0)}
-                        </div>
-                    )}
-                </div>
+        <div className="shrink-0 w-8 h-8 rounded-full bg-center bg-no-repeat bg-cover overflow-hidden border border-gray-200 dark:border-gray-700">
+            {senderImage ? (
+                <img src={senderImage} alt={senderName} className="w-full h-full object-cover" loading="lazy" />
             ) : (
-                <div className="w-8" />
+                <div className="w-full h-full flex items-center justify-center text-[10px] text-muted-foreground font-bold uppercase bg-muted">
+                    {senderName?.charAt(0)}
+                </div>
             )}
         </div>
     );
@@ -93,38 +89,9 @@ export function MessageBubble({
             {/* 상대방 아바타 (왼쪽) */}
             {!isMe && avatarElement}
 
-            <div className={cn("flex flex-col max-w-[70%]", isMe && "items-end")}>
-                {/* 이름 표시 (첫 메시지일 때만) */}
-                {!isChain && (
-                    <span className={cn(
-                        "text-[10px] text-muted-foreground mb-1",
-                        isMe ? "mr-1 text-right" : "ml-1 text-left"
-                    )}>
-                        {senderName}
-                    </span>
-                )}
+            <div className={cn("flex flex-col max-w-[75%]", isMe ? "items-end" : "items-start")}>
 
-                <div className="flex items-end gap-2">
-                    {/* 내 시간 및 상태 (왼쪽) */}
-                    {isMe && (
-                        <div className="flex flex-col items-end min-w-[40px] mb-1">
-                            {/* 안 읽음 표시 (1) */}
-                            {!read && status === "sent" && (
-                                <span className="text-[10px] text-yellow-500 font-bold mb-0.5">1</span>
-                            )}
-
-                            {status === "error" ? (
-                                <button onClick={onRetry} className="text-red-500 hover:text-red-400 transition-colors" title="재전송">
-                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" /><path d="M3 3v5h5" /><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16" /><path d="M3 21v-5h5" /></svg>
-                                </button>
-                            ) : (
-                                <span className={cn("text-[10px] text-white/30 text-right", isChain && "opacity-0 group-hover:opacity-100 transition-opacity")}>
-                                    {timeString}
-                                </span>
-                            )}
-                        </div>
-                    )}
-
+                <div className={cn("flex flex-col", isMe ? "items-end gap-1" : "items-start gap-1")}>
                     {/* 말풍선 본문 */}
                     <div className={cn(
                         "relative transition-opacity duration-300",
@@ -133,7 +100,8 @@ export function MessageBubble({
                         {showAsImage ? (
                             <div className={cn(
                                 "rounded-2xl overflow-hidden shadow-sm border border-white/10",
-                                isMe ? "rounded-tr-none" : "rounded-tl-none"
+                                isMe && !isChain && "rounded-br-sm",
+                                !isMe && !isChain && "rounded-bl-sm"
                             )}>
                                 <img
                                     src={content}
@@ -147,12 +115,12 @@ export function MessageBubble({
                                 <TimelineView plan={travelPlan} />
                             ) : (
                                 <div className={cn(
-                                    "px-4 py-3 rounded-2xl text-sm leading-relaxed break-words shadow-sm",
+                                    "px-4 py-3 rounded-2xl text-[15px] leading-relaxed break-words shadow-sm dark:shadow-none",
                                     isMe
-                                        ? "bg-gradient-to-br from-neon-purple to-indigo-600 text-white"
-                                        : "bg-white/10 text-white/90 border border-white/5",
-                                    isMe && !isChain && "rounded-tr-none",
-                                    !isMe && !isChain && "rounded-tl-none",
+                                        ? "bg-primary text-white"
+                                        : "bg-white dark:bg-input text-slate-800 dark:text-white",
+                                    isMe && !isChain && "rounded-br-sm",
+                                    !isMe && !isChain && "rounded-bl-sm",
                                     isChain && "rounded-2xl",
                                     status === "error" && "border-red-500/50 bg-red-500/10"
                                 )}>
@@ -162,9 +130,29 @@ export function MessageBubble({
                         )}
                     </div>
 
-                    {/* 상대방 시간 (오른쪽) */}
-                    {!isMe && (
-                        <span className={cn("text-[10px] text-white/30 mb-1 min-w-[40px] text-left", isChain && "opacity-0 group-hover:opacity-100 transition-opacity")}>
+                    {/* 시간 및 읽음 상태 */}
+                    {isMe ? (
+                        <div className="flex items-center gap-1 mr-1">
+                            <span className="text-[11px] text-slate-400 dark:text-slate-500">
+                                {timeString}
+                            </span>
+                            {status === "sent" && (
+                                <HugeiconsIcon
+                                    icon={read ? CheckmarkCircle02Icon : Tick02Icon}
+                                    className={cn(
+                                        "w-[14px] h-[14px]",
+                                        read ? "text-primary" : "text-slate-500 dark:text-slate-600"
+                                    )}
+                                />
+                            )}
+                            {status === "error" && (
+                                <button onClick={onRetry} className="text-red-500 hover:text-red-400 transition-colors" title="재전송">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" /><path d="M3 3v5h5" /><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16" /><path d="M3 21v-5h5" /></svg>
+                                </button>
+                            )}
+                        </div>
+                    ) : (
+                        <span className="text-[11px] text-slate-400 dark:text-slate-500 ml-1">
                             {timeString}
                         </span>
                     )}
