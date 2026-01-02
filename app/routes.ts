@@ -15,6 +15,7 @@ export default [
 
     route("concierge", "routes/concierge.tsx", { id: "concierge" }),
     route("login", "routes/login.tsx", { id: "login" }),
+    route("signup", "routes/signup.tsx", { id: "signup" }),
     route("profile", "routes/profile.tsx", { id: "profile" }),
 
     // [AUTH_PLAN.md 명세 준수] 물리적 파일 경로와 URL을 1:1로 매칭

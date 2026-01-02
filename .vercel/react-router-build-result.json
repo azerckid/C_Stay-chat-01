@@ -21,6 +21,7 @@
       "api-room-messages": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
       "concierge": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
       "login": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "signup": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
       "profile": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
       "auth-google-callback": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
       "auth-kakao-callback": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
@@ -128,6 +129,15 @@
         "parentId": "root",
         "file": "app/routes/login.tsx",
         "path": "login",
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "signup": {
+        "id": "signup",
+        "parentId": "root",
+        "file": "app/routes/signup.tsx",
+        "path": "signup",
         "config": {
           "runtime": "nodejs"
         }
@@ -253,6 +263,12 @@
         "file": "routes/login.tsx",
         "path": "login"
       },
+      "signup": {
+        "id": "signup",
+        "parentId": "root",
+        "file": "routes/signup.tsx",
+        "path": "signup"
+      },
       "profile": {
         "id": "profile",
         "parentId": "root",
@@ -340,6 +356,11 @@
             "file": "routes/login.tsx",
             "path": "login",
             "id": "login"
+          },
+          {
+            "file": "routes/signup.tsx",
+            "path": "signup",
+            "id": "signup"
           },
           {
             "file": "routes/profile.tsx",

@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>AI Chat Conversation</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;700&amp;family=Noto+Sans:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#13a4ec",
+                        "background-light": "#f6f7f8",
+                        "background-dark": "#111618", // Matching the component hex
+                        "surface-dark": "#283339",
+                    },
+                    fontFamily: {
+                        "display": ["Plus Jakarta Sans", "Noto Sans", "sans-serif"],
+                        "body": ["Plus Jakarta Sans", "Noto Sans", "sans-serif"],
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark font-display text-white overflow-hidden">
+<div class="relative flex h-full min-h-screen w-full flex-col max-w-md mx-auto shadow-2xl overflow-hidden">
+<!-- Header -->
+<header class="flex items-center bg-[#111618] p-4 pb-2 justify-between border-b border-[#283339] shrink-0 z-10">
+<div class="flex items-center gap-3">
+<button class="text-[#9db0b9] hover:text-white transition-colors">
+<span class="material-symbols-outlined text-2xl">arrow_back_ios_new</span>
+</button>
+<div class="relative">
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10 border border-[#283339]" data-alt="Futuristic abstract orb representing AI avatar" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuD7cVnz7rYtUKrZHMj0PN9yLI_5ctwQk_7cYZupXv6oqhCJWGRAtWeTSGf9QaAvs5TTPya-3azIp9PIPBWng8Icz_DwstVnCRhQc78IbYNrtQAXGTMjoCg-7DiACuDP5mcMhiCcsn7SRVU0zMjoZtRdXkH_DM2LK8C_IhDSB_a08lOpnUlSN2iLTFtynKSZdfzXoXC59cm0XJBMa-7lNtrtnbh6gGesSrvQla1stFnM0l2nfBFbt7i5ajpoRSdNzAhWGkfFCOBZLOXw");'></div>
+<div class="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-500 rounded-full border-2 border-[#111618]"></div>
+</div>
+<div class="flex flex-col">
+<h2 class="text-white text-base font-bold leading-tight tracking-[-0.015em]">Travel AI</h2>
+<span class="text-[#13a4ec] text-xs font-medium">Online</span>
+</div>
+</div>
+<div class="flex items-center justify-end gap-2">
+<button class="flex items-center justify-center rounded-lg size-10 bg-transparent text-[#9db0b9] hover:bg-[#283339] hover:text-white transition-colors">
+<span class="material-symbols-outlined">info</span>
+</button>
+</div>
+</header>
+<!-- Chat Area (Scrollable) -->
+<main class="flex-1 overflow-y-auto bg-[#111618] p-4 flex flex-col gap-6 pb-24">
+<!-- Date Separator -->
+<div class="flex justify-center">
+<span class="text-[#9db0b9] text-xs font-medium bg-[#283339]/50 px-3 py-1 rounded-full">Today</span>
+</div>
+<!-- AI Message -->
+<div class="flex items-end gap-3">
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full w-8 h-8 shrink-0 self-end mb-1" data-alt="Small AI avatar icon" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCYqzCmicNPzc8nJVgGPq38xu7rRLjd2Os-ELDQ29PkkUG_-uHjSWoIkGIxwQOw3cpT7LU8ttpU88YYjH76pkpMNhvwiv-JUVoG9JyvIriTehkeUETz4bcOgkSuggahBE5elhUtpTSvgJKvhCvKN0s3j-JycQbh6eg5NXD4v20auvqPnnS0zSerlF2EyNisT7r1DlRnS_VoZ1XNaAqSZZjvT_blKXoMGU0lJbY8QXwOZAt1SKuV2xbmuoJ2CJB2jtDC7qP-FIpI7v9K");'></div>
+<div class="flex flex-col gap-1 items-start max-w-[85%]">
+<span class="text-[#9db0b9] text-[11px] font-medium ml-1">Travel AI • 10:23 AM</span>
+<div class="text-sm font-normal leading-relaxed rounded-2xl rounded-bl-none px-4 py-3 bg-[#283339] text-white shadow-sm">
+                        Hello! I can help you plan your next trip. Where would you like to go?
+                    </div>
+</div>
+</div>
+<!-- User Message -->
+<div class="flex items-end gap-3 justify-end">
+<div class="flex flex-col gap-1 items-end max-w-[85%]">
+<div class="text-sm font-normal leading-relaxed rounded-2xl rounded-br-none px-4 py-3 bg-[#13a4ec] text-white shadow-sm">
+                        I'm thinking about Japan in April.
+                    </div>
+<span class="text-[#9db0b9] text-[11px] font-medium mr-1">Read • 10:24 AM</span>
+</div>
+</div>
+<!-- AI Message with List -->
+<div class="flex items-end gap-3">
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full w-8 h-8 shrink-0 self-end mb-1" data-alt="Small AI avatar icon" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuAEBn1M6_qH8FrbNevvTvVc_rtMu05rh3M2h-XI4YQVuK2NF0d8f-V-Y9pDOfa9i8aQJ3t8W-TM38KaYBzBlyk0MQMRTNxPc76CFwD22W353u-hITsNu61ZNT97ubTuefeRh7XDTp_23UxFyvsVodFc9KKajdmt3LSBl5d5sHhMG3G4lthWtIUbsnwPf5gbh32n6vAUa6Z2fay82tt79RdNRo0PLnv_MYQbQE_JF80b6veE9PCmQtsoZMo2ndk5wL2NprYs447JP8t2");'></div>
+<div class="flex flex-col gap-1 items-start max-w-[90%]">
+<span class="text-[#9db0b9] text-[11px] font-medium ml-1">Travel AI • 10:24 AM</span>
+<div class="text-sm font-normal leading-relaxed rounded-2xl rounded-bl-none px-4 py-3 bg-[#283339] text-white shadow-sm">
+<p class="mb-2">Japan in April is wonderful! It's the prime season for cherry blossoms (Sakura). 🌸</p>
+<p class="mb-2">Here are a few highlights:</p>
+<ul class="list-disc pl-5 space-y-1 mb-2">
+<li><strong>Tokyo:</strong> Ueno Park for hanami parties.</li>
+<li><strong>Kyoto:</strong> Philosopher's Path is breathtaking.</li>
+<li><strong>Osaka:</strong> Great food and castle views.</li>
+</ul>
+<p>Expect mild weather around 15°C (59°F). Should I create an itinerary?</p>
+</div>
+<!-- Chips / Context Actions -->
+<div class="flex gap-2 mt-1 overflow-x-auto w-full pb-1">
+<button class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#283339] border border-[#3e4c54] hover:bg-[#3e4c54] transition-colors group">
+<span class="material-symbols-outlined text-[16px] text-[#13a4ec] group-hover:text-white">autorenew</span>
+<span class="text-xs font-medium text-[#9db0b9] group-hover:text-white">Regenerate</span>
+</button>
+<button class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#283339] border border-[#3e4c54] hover:bg-[#3e4c54] transition-colors group">
+<span class="material-symbols-outlined text-[16px] text-[#9db0b9] group-hover:text-white">content_copy</span>
+<span class="text-xs font-medium text-[#9db0b9] group-hover:text-white">Copy</span>
+</button>
+<button class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#283339] border border-[#3e4c54] hover:bg-[#3e4c54] transition-colors group">
+<span class="material-symbols-outlined text-[16px] text-[#9db0b9] group-hover:text-white">share</span>
+<span class="text-xs font-medium text-[#9db0b9] group-hover:text-white">Share</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Padding for bottom input/nav -->
+<div class="h-12"></div>
+</main>
+<!-- Input Area (Sticky) -->
+<div class="absolute bottom-[64px] left-0 w-full bg-[#111618]/95 backdrop-blur-md border-t border-[#283339] p-3 z-20">
+<div class="flex items-end gap-2">
+<button class="flex items-center justify-center size-10 rounded-full bg-[#283339] text-[#9db0b9] hover:text-white transition-colors shrink-0">
+<span class="material-symbols-outlined">add</span>
+</button>
+<div class="flex-1 bg-[#283339] rounded-2xl flex items-center min-h-[44px] px-4 py-2">
+<textarea class="bg-transparent border-none text-white placeholder-[#9db0b9] text-sm w-full focus:ring-0 resize-none p-0 max-h-24 leading-5" placeholder="Message Travel AI..." rows="1"></textarea>
+<button class="ml-2 text-[#9db0b9] hover:text-white">
+<span class="material-symbols-outlined text-[20px]">mic</span>
+</button>
+</div>
+<button class="flex items-center justify-center size-10 rounded-full bg-[#13a4ec] text-white hover:bg-[#118cc9] transition-colors shrink-0 shadow-lg shadow-[#13a4ec]/20">
+<span class="material-symbols-outlined text-[20px] ml-0.5">send</span>
+</button>
+</div>
+</div>
+<!-- Bottom Navigation (Sticky) -->
+<nav class="absolute bottom-0 left-0 w-full bg-[#111618] border-t border-[#283339] h-16 flex justify-around items-center px-2 z-30 pb-safe">
+<button class="flex flex-col items-center justify-center w-16 gap-1 group">
+<span class="material-symbols-outlined text-[#9db0b9] text-2xl group-hover:text-white transition-colors">home</span>
+<span class="text-[10px] font-medium text-[#9db0b9] group-hover:text-white transition-colors">Home</span>
+</button>
+<button class="flex flex-col items-center justify-center w-16 gap-1 group">
+<span class="material-symbols-outlined text-[#9db0b9] text-2xl group-hover:text-white transition-colors">group</span>
+<span class="text-[10px] font-medium text-[#9db0b9] group-hover:text-white transition-colors">People</span>
+</button>
+<button class="flex flex-col items-center justify-center w-16 gap-1 group relative">
+<!-- Active Indicator Glow -->
+<div class="absolute -top-3 w-8 h-1 bg-[#13a4ec] rounded-b-full shadow-[0_0_10px_#13a4ec]"></div>
+<span class="material-symbols-outlined text-[#13a4ec] text-2xl fill-1">smart_toy</span>
+<span class="text-[10px] font-bold text-[#13a4ec]">AI</span>
+</button>
+<button class="flex flex-col items-center justify-center w-16 gap-1 group">
+<span class="material-symbols-outlined text-[#9db0b9] text-2xl group-hover:text-white transition-colors">settings</span>
+<span class="text-[10px] font-medium text-[#9db0b9] group-hover:text-white transition-colors">Settings</span>
+</button>
+</nav>
+<!-- Safe Area Spacer for iOS Home Indicator (if bottom padding isn't enough) -->
+<div class="h-[env(safe-area-inset-bottom)] bg-[#111618]"></div>
+</div>
+</body></html>

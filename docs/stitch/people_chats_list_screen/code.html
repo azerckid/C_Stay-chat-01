@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>People Chats Screen</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet"/>
+<script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#EF4444", // Reddish hue
+                        secondary: "#0EA5E9", // Blueish hue
+                        "background-light": "#F3F4F6", // Light gray background
+                        "background-dark": "#111827", // Dark gray background
+                        "surface-light": "#FFFFFF",
+                        "surface-dark": "#1F2937",
+                        "text-primary-light": "#111827",
+                        "text-primary-dark": "#F9FAFB",
+                        "text-secondary-light": "#6B7280",
+                        "text-secondary-dark": "#9CA3AF",
+                    },
+                    fontFamily: {
+                        display: ["Inter", "sans-serif"],
+                    },
+                    borderRadius: {
+                        DEFAULT: "0.75rem",
+                    },
+                },
+            },
+        };
+    </script>
+<style>.no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark font-display antialiased h-screen flex flex-col overflow-hidden transition-colors duration-300">
+<div class="w-full h-12 flex items-center justify-between px-6 pt-2 bg-background-light dark:bg-background-dark z-20">
+<span class="text-sm font-semibold text-text-primary-light dark:text-text-primary-dark">9:41</span>
+<div class="flex items-center space-x-2 text-text-primary-light dark:text-text-primary-dark">
+<span class="material-icons-round text-sm">signal_cellular_alt</span>
+<span class="material-icons-round text-sm">wifi</span>
+<span class="material-icons-round text-sm">battery_full</span>
+</div>
+</div>
+<header class="px-6 py-4 bg-background-light dark:bg-background-dark z-10 sticky top-0">
+<div class="flex flex-col items-center justify-center space-y-4">
+<div class="flex flex-col items-center pt-2">
+<h1 class="text-2xl font-bold text-text-primary-light dark:text-text-primary-dark tracking-tight">People Chats</h1>
+<p class="text-sm text-text-secondary-light dark:text-text-secondary-dark font-medium">Connect with friends &amp; colleagues</p>
+</div>
+<div class="w-full relative group">
+<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+<span class="material-icons-round text-gray-400 dark:text-gray-500">search</span>
+</div>
+<input class="block w-full pl-10 pr-3 py-3 border-none rounded-xl leading-5 bg-surface-light dark:bg-surface-dark text-text-primary-light dark:text-text-primary-dark placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary shadow-sm transition-all duration-200" placeholder="Search conversations..." type="text"/>
+</div>
+</div>
+</header>
+<main class="flex-1 overflow-y-auto no-scrollbar px-4 pb-20 space-y-3">
+<div class="mb-4 pt-2">
+<h2 class="px-2 text-xs font-semibold text-text-secondary-light dark:text-text-secondary-dark uppercase tracking-wider mb-3">Favorites</h2>
+<div class="flex space-x-4 overflow-x-auto no-scrollbar pb-2 px-2">
+<div class="flex flex-col items-center space-y-1 min-w-[64px]">
+<div class="relative">
+<img alt="Sarah avatar" class="w-16 h-16 rounded-full object-cover border-2 border-primary p-0.5" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCyYodtk-whXz4Y5egGjYhdKYrSuMZHsBXM-DlRbJeb_amFXra6mqzw2W_xClT2-ajwKqYPfcSgieDYhkpNCs0Z7VO3WRTG5msEu9sdowimTni103ho_KSOowEGA-IhoLVXyWZyptXuRjXqmKgV3sDyceWkZuSafLI_wd48HPflEwaAvE7NPwaOBkh1mGi1yBMWHhKBf1c4R09YIVu--GLB6DNv74K0e2KJvslzrx2_tGUgwDWjlmsdqHPYfj4IFafAyZA3Q2t8M-WP"/>
+<div class="absolute bottom-0 right-0 w-4 h-4 bg-green-500 border-2 border-background-light dark:border-background-dark rounded-full"></div>
+</div>
+<span class="text-xs font-medium text-text-primary-light dark:text-text-primary-dark truncate w-16 text-center">Sarah</span>
+</div>
+<div class="flex flex-col items-center space-y-1 min-w-[64px]">
+<div class="relative">
+<img alt="Michael avatar" class="w-16 h-16 rounded-full object-cover border-2 border-transparent p-0.5" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC51gEys_ouqlI3nVnYVm5_A8t60LG9n0bOQkWpCktf4bgwzAbACdH3nYfpnrSUnVfiDTpUPIfTXaltZe9sNTFD6SgeUTRFVGQGluZd5QnvxjiOld7BDQyDV3YEZ4XRHUaM9Ema0gkmY_PUD89oh-7bBp4hzeGxf9beSZY4fT4wmlrrCE8-e-MaDyB37yjIMdc0z3IZdsewI2aphngWGR7PD5h1LY9tBdX1_YT6DXPJIoZo8ym43hUYlLU6w5v7xtbkxYIq1XvcHo9J"/>
+<div class="absolute bottom-0 right-0 w-4 h-4 bg-gray-400 border-2 border-background-light dark:border-background-dark rounded-full"></div>
+</div>
+<span class="text-xs font-medium text-text-primary-light dark:text-text-primary-dark truncate w-16 text-center">Michael</span>
+</div>
+<div class="flex flex-col items-center space-y-1 min-w-[64px]">
+<div class="relative">
+<img alt="David avatar" class="w-16 h-16 rounded-full object-cover border-2 border-transparent p-0.5" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAA4TjzAltj03-YtRpYgmaf-aBx2DdY8F2UWHUbBr-FUsLTUwFHA_lidyT3pja7cdS2r6Hbh5jXShNT4NvRjQxaHz-v_hUDVtD8y4ocDtMwq_LCKlAeIhTSKURCUtg8-CYv11yXY7IHDfNm1Z-0A2hwEw0Bstfohz1xRqEl-0wb9UwgkP2wm60t_GGdpMfhm2L-59BEpdDv0xyKrU4YaHOCkK_7QXuYavGEpbbZNKwH4X3HsaBG9b77qnNuoYcjPj14yZrCL9iowvNb"/>
+<div class="absolute bottom-0 right-0 w-4 h-4 bg-green-500 border-2 border-background-light dark:border-background-dark rounded-full"></div>
+</div>
+<span class="text-xs font-medium text-text-primary-light dark:text-text-primary-dark truncate w-16 text-center">David</span>
+</div>
+<div class="flex flex-col items-center space-y-1 min-w-[64px]">
+<div class="relative">
+<div class="w-16 h-16 rounded-full bg-surface-light dark:bg-surface-dark flex items-center justify-center border-2 border-dashed border-gray-300 dark:border-gray-600 text-gray-400">
+<span class="material-icons-round">add</span>
+</div>
+</div>
+<span class="text-xs font-medium text-text-secondary-light dark:text-text-secondary-dark truncate w-16 text-center">Add New</span>
+</div>
+</div>
+</div>
+<div>
+<h2 class="px-2 text-xs font-semibold text-text-secondary-light dark:text-text-secondary-dark uppercase tracking-wider mb-2">Recent Messages</h2>
+<div class="group relative flex items-center p-3 rounded-2xl bg-surface-light dark:bg-surface-dark hover:bg-white dark:hover:bg-gray-800 shadow-sm border border-transparent hover:border-gray-100 dark:hover:border-gray-700 transition-all duration-200 cursor-pointer mb-3">
+<div class="relative flex-shrink-0">
+<img alt="Sarah Wilson" class="h-12 w-12 rounded-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBLm37jAOr6va9Jm6AitbjjMuNTh3qKkCoR724aQ_sDdsJiNHUrJDdYvOfdhwsubywGThrWcbTu7mUAB4Xa6bXdl2EgZZ9VubS049S8DC-DIcHI-Wg7fRfhqJ-XTRIZnVoe0rnMmLwlk3dlKdXUzdgwg9idruvapSh_sh7qpnJ-pIeXIxsybjMwwr0AeHUMBZs_KO97hQwiXNI1pHnN9qgqmuqKPy-JQi2tsZOV-W_AnRkjVTf3JROKFZwR5vYc5ZFk0QCDBSYw9LX5"/>
+<span class="absolute bottom-0 right-0 block h-2.5 w-2.5 rounded-full bg-green-400 ring-2 ring-surface-light dark:ring-surface-dark"></span>
+</div>
+<div class="ml-4 flex-1 min-w-0">
+<div class="flex items-center justify-between mb-0.5">
+<p class="text-sm font-bold text-text-primary-light dark:text-text-primary-dark truncate">Sarah Wilson</p>
+<p class="text-xs text-primary font-medium">10:42 AM</p>
+</div>
+<div class="flex items-center justify-between">
+<p class="text-sm text-text-secondary-light dark:text-text-secondary-dark truncate">Did you see the new AI features update?</p>
+<span class="inline-flex items-center justify-center px-2 py-0.5 ml-2 text-xs font-bold leading-none text-white bg-primary rounded-full">2</span>
+</div>
+</div>
+</div>
+<div class="group relative flex items-center p-3 rounded-2xl bg-surface-light dark:bg-surface-dark hover:bg-white dark:hover:bg-gray-800 shadow-sm border border-transparent hover:border-gray-100 dark:hover:border-gray-700 transition-all duration-200 cursor-pointer mb-3">
+<div class="relative flex-shrink-0">
+<img alt="James Carter" class="h-12 w-12 rounded-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAMDPSTsICDvlz9xr2fRzTNm79yxBIheLfqlm9rRnCr3SEhTDOA3KaGOG7hUifT3AoZCpPe7_1I3aV6CnIcM_r1mOZPmdkfViGuKXy5ExtQwQVEUXmsY5f_gsXCkei7ppNqIjiyT2fKyUszi-FBQiV4ULbIF4ypFmpz-zSUutdyCryVf1u7aBCJXuRKV-JdJBAmKS8sDkDn-3Krj8wOxWOTERhGrrbf5JO8apeUrKVXTsJ5tvSh_LC30cjGNPMmN_yKTlgm0umz2r1r"/>
+</div>
+<div class="ml-4 flex-1 min-w-0">
+<div class="flex items-center justify-between mb-0.5">
+<p class="text-sm font-bold text-text-primary-light dark:text-text-primary-dark truncate">James Carter</p>
+<p class="text-xs text-text-secondary-light dark:text-text-secondary-dark">Yesterday</p>
+</div>
+<p class="text-sm text-text-secondary-light dark:text-text-secondary-dark truncate">Let's schedule a meeting for next Tuesday.</p>
+</div>
+</div>
+<div class="group relative flex items-center p-3 rounded-2xl bg-surface-light dark:bg-surface-dark hover:bg-white dark:hover:bg-gray-800 shadow-sm border border-transparent hover:border-gray-100 dark:hover:border-gray-700 transition-all duration-200 cursor-pointer mb-3">
+<div class="relative flex-shrink-0">
+<img alt="Emily Chen" class="h-12 w-12 rounded-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAGlfPEBoXqneR41H5qz-TAOFZSth6ELaRtQR_-UB1WStsK3AC-e3y-tGYbRQPHQyHn6YQSQTW4uEqtEB4A0OOYprdo-19T8lFJEsE97nYo5XlslYPnBnN9hjlbeIX5fgbNUEGMT8dVBTZP2RXjb7s1TobHkXgFTHRGbBuYESWCJPOyAjC38WPJjl67nzCIqEVFOWv27LJaBT7b8uhRob8yawL4DARx3V3927569YKYZ3DM--qBUj9ob18n9E6DuFTUWcmoTG7r8OMT"/>
+<span class="absolute bottom-0 right-0 block h-2.5 w-2.5 rounded-full bg-gray-300 ring-2 ring-surface-light dark:ring-surface-dark"></span>
+</div>
+<div class="ml-4 flex-1 min-w-0">
+<div class="flex items-center justify-between mb-0.5">
+<p class="text-sm font-bold text-text-primary-light dark:text-text-primary-dark truncate">Emily Chen</p>
+<p class="text-xs text-text-secondary-light dark:text-text-secondary-dark">Mon</p>
+</div>
+<div class="flex items-center">
+<span class="material-icons-round text-sm mr-1 text-secondary">done_all</span>
+<p class="text-sm text-text-secondary-light dark:text-text-secondary-dark truncate">Thanks for the update!</p>
+</div>
+</div>
+</div>
+<div class="group relative flex items-center p-3 rounded-2xl bg-surface-light dark:bg-surface-dark hover:bg-white dark:hover:bg-gray-800 shadow-sm border border-transparent hover:border-gray-100 dark:hover:border-gray-700 transition-all duration-200 cursor-pointer mb-3">
+<div class="relative flex-shrink-0">
+<div class="h-12 w-12 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold text-lg">
+                        M
+                    </div>
+</div>
+<div class="ml-4 flex-1 min-w-0">
+<div class="flex items-center justify-between mb-0.5">
+<p class="text-sm font-bold text-text-primary-light dark:text-text-primary-dark truncate">Marketing Team</p>
+<p class="text-xs text-text-secondary-light dark:text-text-secondary-dark">Sun</p>
+</div>
+<p class="text-sm text-text-secondary-light dark:text-text-secondary-dark truncate">
+<span class="font-medium text-text-primary-light dark:text-text-primary-dark">Alex:</span> The new campaign assets are ready for review.
+                    </p>
+</div>
+</div>
+<div class="group relative flex items-center p-3 rounded-2xl bg-surface-light dark:bg-surface-dark hover:bg-white dark:hover:bg-gray-800 shadow-sm border border-transparent hover:border-gray-100 dark:hover:border-gray-700 transition-all duration-200 cursor-pointer mb-3">
+<div class="relative flex-shrink-0">
+<img alt="Robert Fox" class="h-12 w-12 rounded-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAHyfSY_s2lzYd57mg4fSogxjvUsvNFcQNh_gdsT51FDW6hOqpnpcj3mk30b7BFRLh9HkMqVlq8y1SV1UEzaM1roATbePqkLHfXtuwK6FxggkZ7fbyo1VrKA1kpkbmwjo-CKIRZHZH8FUi19aYWBWdjqKe9AmaxZXx1w-pilh7eS8tLdvk8i8v7sUYJga2EQorMUXaNiBsupz0zpYdZqQRdaromzHrlePdWzkK7fk_ElHCZajXkVKUbZiznpbntpBkve8moIm-_819_"/>
+</div>
+<div class="ml-4 flex-1 min-w-0">
+<div class="flex items-center justify-between mb-0.5">
+<p class="text-sm font-bold text-text-primary-light dark:text-text-primary-dark truncate">Robert Fox</p>
+<p class="text-xs text-text-secondary-light dark:text-text-secondary-dark">Last week</p>
+</div>
+<div class="flex items-center">
+<span class="material-icons-round text-sm mr-1 text-gray-400">mic</span>
+<p class="text-sm text-text-secondary-light dark:text-text-secondary-dark truncate">0:42</p>
+</div>
+</div>
+</div>
+</div>
+</main>
+<button class="absolute bottom-24 right-6 w-14 h-14 bg-primary text-white rounded-full shadow-lg flex items-center justify-center hover:scale-105 active:scale-95 transition-transform duration-200 z-30">
+<span class="material-icons-round text-2xl">chat_bubble</span>
+</button>
+<nav class="bg-surface-light dark:bg-surface-dark border-t border-gray-200 dark:border-gray-800 z-40 pb-6 pt-3 px-6 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
+<div class="flex justify-between items-center max-w-sm mx-auto">
+<button class="flex flex-col items-center space-y-1 group w-16 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors duration-200">
+<div class="p-2">
+<span class="material-icons-round text-2xl">home</span>
+</div>
+<span class="text-[10px] font-medium">Home</span>
+</button>
+<button class="flex flex-col items-center space-y-1 group w-16">
+<div class="relative p-2 rounded-xl bg-primary/10 dark:bg-primary/20">
+<span class="material-icons-round text-primary text-2xl">people</span>
+<span class="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full border border-surface-light dark:border-surface-dark"></span>
+</div>
+<span class="text-[10px] font-medium text-primary">People</span>
+</button>
+<button class="flex flex-col items-center space-y-1 group w-16 text-gray-400 hover:text-secondary transition-colors duration-200">
+<div class="p-2">
+<span class="material-icons-round text-2xl group-hover:animate-pulse">smart_toy</span>
+</div>
+<span class="text-[10px] font-medium group-hover:text-secondary">AI</span>
+</button>
+<button class="flex flex-col items-center space-y-1 group w-16 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors duration-200">
+<div class="p-2">
+<span class="material-icons-round text-2xl">settings</span>
+</div>
+<span class="text-[10px] font-medium">Settings</span>
+</button>
+</div>
+</nav>
+<script>
+        // Simple script to toggle dark mode for demonstration purposes
+        // In a real app, this would be handled by system preference or settings
+        // document.body.addEventListener('click', () => {
+        //     document.documentElement.classList.toggle('dark');
+        // });
+        // Check for system preference on load
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            document.documentElement.classList.add('dark');
+        }
+    </script>
+</body></html>

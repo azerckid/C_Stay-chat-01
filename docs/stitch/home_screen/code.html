@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Travel Home Screen</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet"/>
+<script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#EF4444", // Reddish hue
+                        secondary: "#0EA5E9", // Blueish hue
+                        "background-light": "#F3F4F6", // Light gray background
+                        "background-dark": "#111827", // Dark gray background
+                        "surface-light": "#FFFFFF",
+                        "surface-dark": "#1F2937",
+                        "text-primary-light": "#111827",
+                        "text-primary-dark": "#F9FAFB",
+                        "text-secondary-light": "#6B7280",
+                        "text-secondary-dark": "#9CA3AF",
+                    },
+                    fontFamily: {
+                        display: ["Inter", "sans-serif"],
+                    },
+                    borderRadius: {
+                        DEFAULT: "0.75rem",
+                    },
+                },
+            },
+        };
+    </script>
+<style>.no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark font-display antialiased h-screen flex flex-col overflow-hidden transition-colors duration-300">
+<div class="w-full h-12 flex items-center justify-between px-6 pt-2 bg-background-light dark:bg-background-dark z-20">
+<span class="text-sm font-semibold text-text-primary-light dark:text-text-primary-dark">9:41</span>
+<div class="flex items-center space-x-2 text-text-primary-light dark:text-text-primary-dark">
+<span class="material-icons-round text-sm">signal_cellular_alt</span>
+<span class="material-icons-round text-sm">wifi</span>
+<span class="material-icons-round text-sm">battery_full</span>
+</div>
+</div>
+<header class="px-6 pb-2 pt-4 bg-background-light dark:bg-background-dark z-10 sticky top-0">
+<div class="w-full relative group">
+<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+<span class="material-icons-round text-gray-400 dark:text-gray-500">search</span>
+</div>
+<input class="block w-full pl-10 pr-3 py-3 border-none rounded-xl leading-5 bg-surface-light dark:bg-surface-dark text-text-primary-light dark:text-text-primary-dark placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary shadow-sm transition-all duration-200" placeholder="Where do you want to go?" type="text"/>
+<div class="absolute inset-y-0 right-0 pr-3 flex items-center">
+<button class="p-1 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
+<span class="material-icons-round text-lg">tune</span>
+</button>
+</div>
+</div>
+</header>
+<main class="flex-1 overflow-y-auto no-scrollbar pb-20 space-y-6">
+<div class="pt-2">
+<div class="px-6 flex justify-between items-end mb-3">
+<h2 class="text-lg font-bold text-text-primary-light dark:text-text-primary-dark">Today's Popular</h2>
+<a class="text-xs font-semibold text-primary" href="#">See All</a>
+</div>
+<div class="flex space-x-4 overflow-x-auto no-scrollbar px-6 pb-4">
+<div class="relative min-w-[200px] h-[260px] rounded-2xl overflow-hidden shadow-md group cursor-pointer">
+<img alt="Kyoto" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCe8WgURqfpuA29_fwqsvtnIKZNgWJb8FRMCCXAgQF82VMDlkQ-BNxfbf5_t-NN3CSU5Uyo5eGOujG9NFftX0mCyi_uE2T3ZYsPZyJe0dvqB0ph1Ldutujf3bR-vPqe_94T7BSh5DjeCPcTZjUKx_d7UiB1ROe_H5HkU6ZV8VazwmXdWC4tW4RpzJhN_YNWW9nLoQrMxg2Hy1-5Ol6-bIyYq9CGTMvnpsk1GaT2ewwu3pWAkSkxyfdkc_JtSfB8J05erNmrhXKoWld-"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent"></div>
+<div class="absolute bottom-4 left-4 right-4">
+<span class="inline-block px-2 py-1 bg-white/20 backdrop-blur-md rounded-md text-[10px] font-medium text-white mb-2">Historical</span>
+<h3 class="text-xl font-bold text-white">Kyoto</h3>
+<div class="flex items-center text-gray-300 text-xs mt-1">
+<span class="material-icons-round text-[14px] mr-1">location_on</span>
+                        Japan
+                    </div>
+</div>
+</div>
+<div class="relative min-w-[200px] h-[260px] rounded-2xl overflow-hidden shadow-md group cursor-pointer">
+<img alt="Cinque Terre" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCq6oAi4yU42sEHXIRo6b_Eov-4Ecq_IAGaiaTdq7Uz9MfcghBqf6GzRj3PU83C1VzpndQB7zDNQqSKRzw8PeU7UCqRgPptdWCwNhK8VONHhk-xavgsNy2P1FPwdNgOF7GU-GrUEzB9ufFss-6_6-ZAiJ7c5BOeKu_4ioatbdEW-C9Rv3BgGrmbb6diiBNrAWhFhNukh1PYNtcIhMtzX7rIacqHyQfuG9Dg2h4dRHSzQ-btCl1ULM5Z3Whd1RGFoDSsz88Nv4kvdu20"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent"></div>
+<div class="absolute bottom-4 left-4 right-4">
+<span class="inline-block px-2 py-1 bg-white/20 backdrop-blur-md rounded-md text-[10px] font-medium text-white mb-2">Coastal</span>
+<h3 class="text-xl font-bold text-white">Cinque Terre</h3>
+<div class="flex items-center text-gray-300 text-xs mt-1">
+<span class="material-icons-round text-[14px] mr-1">location_on</span>
+                        Italy
+                    </div>
+</div>
+</div>
+<div class="relative min-w-[200px] h-[260px] rounded-2xl overflow-hidden shadow-md group cursor-pointer">
+<img alt="Sydney" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCxZ3vyr_OYKVfgIcCZCsCLZ23ExxMyGqNY4Pn88IDmhA-CQivNN_zRqtXi1C2JS54Ga2bnz4erct9PgcLoV_OEKg6dKO8CkjfWZZp23YP2Vvz3XmgQpBTzoKsjzAoWTCjqt1Za9LKqK1UGwaFF1NbDhe40Tf21jlSmVDyuFoPM7PCpzI1dAtLrPfggHzt28SilwM1cN3zDfZ6ZRnT7uNxF_D96nRW-xibreJo075zYihCaQxJboa9hz01198R9ArkCWxxIVXMwcuoJ"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent"></div>
+<div class="absolute bottom-4 left-4 right-4">
+<span class="inline-block px-2 py-1 bg-white/20 backdrop-blur-md rounded-md text-[10px] font-medium text-white mb-2">Urban</span>
+<h3 class="text-xl font-bold text-white">Sydney</h3>
+<div class="flex items-center text-gray-300 text-xs mt-1">
+<span class="material-icons-round text-[14px] mr-1">location_on</span>
+                        Australia
+                    </div>
+</div>
+</div>
+</div>
+</div>
+<div>
+<div class="px-6 flex justify-between items-end mb-3">
+<h2 class="text-lg font-bold text-text-primary-light dark:text-text-primary-dark">Popular Stays</h2>
+<a class="text-xs font-semibold text-primary" href="#">View All</a>
+</div>
+<div class="flex space-x-4 overflow-x-auto no-scrollbar px-6 pb-2">
+<div class="min-w-[240px] bg-surface-light dark:bg-surface-dark rounded-xl p-3 shadow-sm border border-transparent hover:border-gray-200 dark:hover:border-gray-700 transition-all cursor-pointer">
+<div class="relative h-32 rounded-lg overflow-hidden mb-3">
+<img alt="Resort" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDv3X4_9TLPNDWpI9Mnam9Y8cPR0zqXpypVs1WmNcSYjTmhx65WcFSLP2A7F3KrDOVMgqrbhm9DrYUebNymK0fL2SXSZ09ECUimI4qPNzq3cO7cASQieilO5MGLHaaZLzE_iU5o_59zysZhhita1KZb_Rl_clLCmqfgFFiH6G-XfVrxzCgJtPdAtdEN2_hQObMyH4rWJBEW9RdLZ8bqhVwBfMD2AI1V83179M43EOBmTqhytg4SS8JLfc5i-M9x7ECVu_NNFkWiCtZT"/>
+<div class="absolute top-2 right-2 bg-white dark:bg-gray-900 px-1.5 py-0.5 rounded flex items-center shadow-sm">
+<span class="material-icons-round text-yellow-400 text-xs">star</span>
+<span class="text-xs font-bold ml-0.5 text-gray-800 dark:text-white">4.9</span>
+</div>
+</div>
+<h3 class="font-bold text-text-primary-light dark:text-text-primary-dark truncate">Oceanview Resort</h3>
+<p class="text-xs text-text-secondary-light dark:text-text-secondary-dark flex items-center mt-1">
+<span class="material-icons-round text-[14px] mr-1 text-gray-400">place</span> Maldives
+                </p>
+<div class="mt-2 flex items-end justify-between">
+<div class="text-primary font-bold text-sm">$320<span class="text-gray-400 font-normal text-xs">/night</span></div>
+</div>
+</div>
+<div class="min-w-[240px] bg-surface-light dark:bg-surface-dark rounded-xl p-3 shadow-sm border border-transparent hover:border-gray-200 dark:hover:border-gray-700 transition-all cursor-pointer">
+<div class="relative h-32 rounded-lg overflow-hidden mb-3">
+<img alt="Hotel" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDparDbJejnBrOeT1aGEG4a9ImuUYY-GPCviVQjfpnJbrAJ_NA1mFUA6qva15L2HERpHWjpkdMLh4P5paD0iBWuFCUDZ5XpO7mqkz-5jXMENzbOb52GsaqBxrhmYw6QjhDwzSjBlf85B_lfv2uzhJDzKnGCqzrOgmiMOXrMZtfqrtFLC-HCMXRiCfZHSOWlofwOil0DD05HOd0r9-cZw1ed2vAfEUuewe5YrW7JMWpF66P6NBdnKDSrPusMzstFWjySWpgI8dmUpn_G"/>
+<div class="absolute top-2 right-2 bg-white dark:bg-gray-900 px-1.5 py-0.5 rounded flex items-center shadow-sm">
+<span class="material-icons-round text-yellow-400 text-xs">star</span>
+<span class="text-xs font-bold ml-0.5 text-gray-800 dark:text-white">4.8</span>
+</div>
+</div>
+<h3 class="font-bold text-text-primary-light dark:text-text-primary-dark truncate">The Alpine Lodge</h3>
+<p class="text-xs text-text-secondary-light dark:text-text-secondary-dark flex items-center mt-1">
+<span class="material-icons-round text-[14px] mr-1 text-gray-400">place</span> Switzerland
+                </p>
+<div class="mt-2 flex items-end justify-between">
+<div class="text-primary font-bold text-sm">$450<span class="text-gray-400 font-normal text-xs">/night</span></div>
+</div>
+</div>
+</div>
+</div>
+<div class="px-6 pb-6">
+<h2 class="text-lg font-bold text-text-primary-light dark:text-text-primary-dark mb-3">Special Flight Deals</h2>
+<div class="space-y-3">
+<div class="bg-surface-light dark:bg-surface-dark rounded-xl p-4 shadow-sm flex items-center justify-between cursor-pointer active:scale-95 transition-transform">
+<div class="flex items-center space-x-4">
+<div class="w-10 h-10 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center text-primary">
+<span class="material-icons-round">flight_takeoff</span>
+</div>
+<div>
+<div class="flex items-center space-x-2">
+<span class="font-bold text-text-primary-light dark:text-text-primary-dark">NYC</span>
+<span class="material-icons-round text-gray-400 text-xs">arrow_forward</span>
+<span class="font-bold text-text-primary-light dark:text-text-primary-dark">LON</span>
+</div>
+<p class="text-xs text-text-secondary-light dark:text-text-secondary-dark mt-0.5">British Airways • Direct</p>
+</div>
+</div>
+<div class="text-right">
+<span class="block text-lg font-bold text-primary">$450</span>
+<span class="text-[10px] text-gray-400 line-through">$680</span>
+</div>
+</div>
+<div class="bg-surface-light dark:bg-surface-dark rounded-xl p-4 shadow-sm flex items-center justify-between cursor-pointer active:scale-95 transition-transform">
+<div class="flex items-center space-x-4">
+<div class="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-secondary">
+<span class="material-icons-round">flight_takeoff</span>
+</div>
+<div>
+<div class="flex items-center space-x-2">
+<span class="font-bold text-text-primary-light dark:text-text-primary-dark">SFO</span>
+<span class="material-icons-round text-gray-400 text-xs">arrow_forward</span>
+<span class="font-bold text-text-primary-light dark:text-text-primary-dark">TYO</span>
+</div>
+<p class="text-xs text-text-secondary-light dark:text-text-secondary-dark mt-0.5">ANA • 1 Stop</p>
+</div>
+</div>
+<div class="text-right">
+<span class="block text-lg font-bold text-primary">$820</span>
+<span class="text-[10px] text-gray-400 line-through">$1,100</span>
+</div>
+</div>
+</div>
+</div>
+</main>
+<nav class="bg-surface-light dark:bg-surface-dark border-t border-gray-200 dark:border-gray-800 z-40 pb-6 pt-3 px-6 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
+<div class="flex justify-between items-center max-w-sm mx-auto">
+<button class="flex flex-col items-center space-y-1 group w-14">
+<div class="relative p-1.5 rounded-xl bg-primary/10 dark:bg-primary/20">
+<span class="material-icons-round text-primary text-2xl">home</span>
+</div>
+<span class="text-[10px] font-medium text-primary">Home</span>
+</button>
+<button class="flex flex-col items-center space-y-1 group w-14 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors duration-200">
+<div class="p-1.5">
+<span class="material-icons-round text-2xl">people</span>
+</div>
+<span class="text-[10px] font-medium">People</span>
+</button>
+<button class="flex flex-col items-center space-y-1 group w-14 text-gray-400 hover:text-secondary transition-colors duration-200">
+<div class="p-1.5 relative">
+<span class="material-icons-round text-2xl group-hover:animate-pulse">smart_toy</span>
+<span class="absolute top-1 right-0 w-2 h-2 bg-secondary rounded-full border border-surface-light dark:border-surface-dark"></span>
+</div>
+<span class="text-[10px] font-medium group-hover:text-secondary">AI</span>
+</button>
+<button class="flex flex-col items-center space-y-1 group w-14 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors duration-200">
+<div class="p-1.5">
+<span class="material-icons-round text-2xl">settings</span>
+</div>
+<span class="text-[10px] font-medium">Settings</span>
+</button>
+</div>
+</nav>
+<script>
+        // Check for system preference on load
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            document.documentElement.classList.add('dark');
+        }
+    </script>
+
+</body></html>

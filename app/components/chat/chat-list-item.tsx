@@ -1,4 +1,3 @@
-import { motion } from "framer-motion";
 import { Link } from "react-router";
 import { cn } from "~/lib/utils";
 import { formatMessageTime } from "~/lib/date-utils";
@@ -29,12 +28,11 @@ export function ChatListItem({
 
     return (
         <Link to={`/chat/${id}`} className="block w-full">
-            <motion.div
-                whileTap={{ scale: 0.98 }}
+            <div
                 className={cn(
-                    "group relative flex items-center p-3 rounded-2xl transition-all duration-200 cursor-pointer",
-                    "bg-card hover:bg-white dark:hover:bg-muted shadow-sm",
-                    "border border-transparent hover:border-border"
+                    "group relative flex items-center p-3 rounded-2xl transition-all duration-200 cursor-pointer mb-3",
+                    "bg-white dark:bg-[#1F2937] hover:bg-white dark:hover:bg-gray-800 shadow-sm",
+                    "border border-transparent hover:border-gray-100 dark:hover:border-gray-700"
                 )}
             >
                 {/* Avatar */}
@@ -46,33 +44,33 @@ export function ChatListItem({
                             src={image}
                         />
                     ) : (
-                        <div className="h-12 w-12 rounded-full bg-muted flex items-center justify-center">
-                            <span className="text-sm font-bold text-foreground">
+                        <div className="h-12 w-12 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center">
+                            <span className="text-white font-bold text-lg">
                                 {title.charAt(0).toUpperCase()}
                             </span>
                         </div>
                     )}
                     {/* Online Status */}
                     {isOnline && (
-                        <span className="absolute bottom-0 right-0 block h-2.5 w-2.5 rounded-full bg-green-500 ring-2 ring-card" />
+                        <span className="absolute bottom-0 right-0 block h-2.5 w-2.5 rounded-full bg-green-400 ring-2 ring-white dark:ring-[#1F2937]" />
                     )}
                 </div>
 
                 {/* Content */}
                 <div className="ml-4 flex-1 min-w-0">
                     <div className="flex items-center justify-between mb-0.5">
-                        <p className="text-sm font-bold text-foreground truncate">
+                        <p className="text-sm font-bold text-[#111827] dark:text-[#F9FAFB] truncate">
                             {title}
                         </p>
                         <p className={cn(
                             "text-xs shrink-0 ml-2",
-                            unreadCount > 0 ? "text-primary font-medium" : "text-muted-foreground"
+                            unreadCount > 0 ? "text-primary font-medium" : "text-[#6B7280] dark:text-[#9CA3AF]"
                         )}>
                             {timeStr}
                         </p>
                     </div>
                     <div className="flex items-center justify-between">
-                        <p className="text-sm text-muted-foreground truncate">
+                        <p className="text-sm text-[#6B7280] dark:text-[#9CA3AF] truncate">
                             {lastMessage}
                         </p>
                         {unreadCount > 0 && (
@@ -82,7 +80,7 @@ export function ChatListItem({
                         )}
                     </div>
                 </div>
-            </motion.div>
+            </div>
         </Link>
     );
 }

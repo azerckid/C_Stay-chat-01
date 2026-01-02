@@ -3,7 +3,6 @@ import { SafeArea, BottomNav } from "../components/layout";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { SearchIcon, Settings02Icon, Location01Icon, ArrowRight01Icon } from "@hugeicons/core-free-icons";
 import { Link } from "react-router";
-import { motion } from "framer-motion";
 import { useState } from "react";
 
 export const meta: MetaFunction = () => {
@@ -84,22 +83,22 @@ export default function Home() {
     ];
 
     return (
-        <SafeArea className="bg-background flex flex-col h-screen overflow-hidden">
+        <SafeArea className="bg-[#F3F4F6] dark:bg-[#111827] flex flex-col h-screen overflow-hidden">
             {/* Header - Search */}
-            <header className="px-6 pb-2 pt-4 bg-background z-10 sticky top-0">
+            <header className="px-6 pb-2 pt-4 bg-[#F3F4F6] dark:bg-[#111827] z-10 sticky top-0">
                 <div className="w-full relative group">
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <HugeiconsIcon icon={SearchIcon} className="w-5 h-5 text-muted-foreground" />
+                        <HugeiconsIcon icon={SearchIcon} className="w-5 h-5 text-gray-400 dark:text-gray-500" />
                     </div>
                     <input
                         type="text"
                         placeholder="Where do you want to go?"
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
-                        className="block w-full pl-10 pr-12 py-3 border-none rounded-xl leading-5 bg-card text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary shadow-sm transition-all duration-200"
+                        className="block w-full pl-10 pr-12 py-3 border-none rounded-xl leading-5 bg-white dark:bg-[#1F2937] text-[#111827] dark:text-[#F9FAFB] placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-primary shadow-sm transition-all duration-200"
                     />
                     <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
-                        <button className="p-1 rounded-full bg-muted text-muted-foreground hover:bg-muted/80 transition-colors">
+                        <button className="p-1 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
                             <HugeiconsIcon icon={Settings02Icon} className="w-5 h-5" />
                         </button>
                     </div>
@@ -107,21 +106,19 @@ export default function Home() {
             </header>
 
             {/* Main Content */}
-            <main className="flex-1 overflow-y-auto pb-20 space-y-6">
+            <main className="flex-1 overflow-y-auto no-scrollbar pb-20 space-y-6">
                 {/* Today's Popular */}
                 <div className="pt-2">
                     <div className="px-6 flex justify-between items-end mb-3">
-                        <h2 className="text-lg font-bold text-foreground">Today's Popular</h2>
+                        <h2 className="text-lg font-bold text-[#111827] dark:text-[#F9FAFB]">Today's Popular</h2>
                         <Link to="#" className="text-xs font-semibold text-primary hover:underline">
                             See All
                         </Link>
                     </div>
-                    <div className="flex space-x-4 overflow-x-auto scrollbar-hide px-6 pb-4">
+                    <div className="flex space-x-4 overflow-x-auto no-scrollbar px-6 pb-4">
                         {popularDestinations.map((destination) => (
-                            <motion.div
+                            <div
                                 key={destination.id}
-                                whileHover={{ scale: 1.02 }}
-                                whileTap={{ scale: 0.98 }}
                                 className="relative min-w-[200px] h-[260px] rounded-2xl overflow-hidden shadow-md group cursor-pointer"
                             >
                                 <img
@@ -140,7 +137,7 @@ export default function Home() {
                                         {destination.location}
                                     </div>
                                 </div>
-                            </motion.div>
+                            </div>
                         ))}
                     </div>
                 </div>
@@ -148,76 +145,73 @@ export default function Home() {
                 {/* Popular Stays */}
                 <div>
                     <div className="px-6 flex justify-between items-end mb-3">
-                        <h2 className="text-lg font-bold text-foreground">Popular Stays</h2>
+                        <h2 className="text-lg font-bold text-[#111827] dark:text-[#F9FAFB]">Popular Stays</h2>
                         <Link to="#" className="text-xs font-semibold text-primary hover:underline">
                             View All
                         </Link>
                     </div>
-                    <div className="flex space-x-4 overflow-x-auto scrollbar-hide px-6 pb-2">
+                    <div className="flex space-x-4 overflow-x-auto no-scrollbar px-6 pb-2">
                         {popularStays.map((stay) => (
-                            <motion.div
+                            <div
                                 key={stay.id}
-                                whileHover={{ scale: 1.02 }}
-                                whileTap={{ scale: 0.98 }}
-                                className="min-w-[240px] bg-card rounded-xl p-3 shadow-sm border border-transparent hover:border-border transition-all cursor-pointer"
+                                className="min-w-[240px] bg-white dark:bg-[#1F2937] rounded-xl p-3 shadow-sm border border-transparent hover:border-gray-200 dark:hover:border-gray-700 transition-all cursor-pointer"
                             >
                                 <div className="relative h-32 rounded-lg overflow-hidden mb-3">
                                     <img alt={stay.name} src={stay.image} className="w-full h-full object-cover" />
-                                    <div className="absolute top-2 right-2 bg-background px-1.5 py-0.5 rounded flex items-center shadow-sm">
+                                    <div className="absolute top-2 right-2 bg-white dark:bg-gray-900 px-1.5 py-0.5 rounded flex items-center shadow-sm">
                                         <svg className="w-3 h-3 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
                                             <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                                         </svg>
-                                        <span className="text-xs font-bold ml-0.5 text-foreground">{stay.rating}</span>
+                                        <span className="text-xs font-bold ml-0.5 text-gray-800 dark:text-white">{stay.rating}</span>
                                     </div>
                                 </div>
-                                <h3 className="font-bold text-foreground truncate">{stay.name}</h3>
-                                <p className="text-xs text-muted-foreground flex items-center mt-1">
-                                    <HugeiconsIcon icon={Location01Icon} className="w-[14px] h-[14px] mr-1 text-muted-foreground" />
+                                <h3 className="font-bold text-[#111827] dark:text-[#F9FAFB] truncate">{stay.name}</h3>
+                                <p className="text-xs text-[#6B7280] dark:text-[#9CA3AF] flex items-center mt-1">
+                                    <HugeiconsIcon icon={Location01Icon} className="w-[14px] h-[14px] mr-1 text-gray-400" />
                                     {stay.location}
                                 </p>
                                 <div className="mt-2 flex items-end justify-between">
                                     <div className="text-primary font-bold text-sm">
                                         ${stay.price}
-                                        <span className="text-muted-foreground font-normal text-xs">/night</span>
+                                        <span className="text-gray-400 font-normal text-xs">/night</span>
                                     </div>
                                 </div>
-                            </motion.div>
+                            </div>
                         ))}
                     </div>
                 </div>
 
                 {/* Special Flight Deals */}
                 <div className="px-6 pb-6">
-                    <h2 className="text-lg font-bold text-foreground mb-3">Special Flight Deals</h2>
+                    <h2 className="text-lg font-bold text-[#111827] dark:text-[#F9FAFB] mb-3">Special Flight Deals</h2>
                     <div className="space-y-3">
                         {flightDeals.map((deal) => (
-                            <motion.div
+                            <div
                                 key={deal.id}
-                                whileTap={{ scale: 0.95 }}
-                                className="bg-card rounded-xl p-4 shadow-sm flex items-center justify-between cursor-pointer transition-transform"
+                                className="bg-white dark:bg-[#1F2937] rounded-xl p-4 shadow-sm flex items-center justify-between cursor-pointer active:scale-95 transition-transform"
                             >
                                 <div className="flex items-center space-x-4">
                                     <div className={`w-10 h-10 rounded-full ${deal.iconColor} flex items-center justify-center`}>
-                                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                                        <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                                            <path d="M21 16v-2l-8-5V3.5c0-.83-.67-1.5-1.5-1.5S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z" />
                                         </svg>
                                     </div>
                                     <div>
                                         <div className="flex items-center space-x-2">
-                                            <span className="font-bold text-foreground">{deal.from}</span>
-                                            <HugeiconsIcon icon={ArrowRight01Icon} className="w-3 h-3 text-muted-foreground" />
-                                            <span className="font-bold text-foreground">{deal.to}</span>
+                                            <span className="font-bold text-[#111827] dark:text-[#F9FAFB]">{deal.from}</span>
+                                            <HugeiconsIcon icon={ArrowRight01Icon} className="w-3 h-3 text-gray-400" />
+                                            <span className="font-bold text-[#111827] dark:text-[#F9FAFB]">{deal.to}</span>
                                         </div>
-                                        <p className="text-xs text-muted-foreground mt-0.5">
+                                        <p className="text-xs text-[#6B7280] dark:text-[#9CA3AF] mt-0.5">
                                             {deal.airline} • {deal.type}
                                         </p>
                                     </div>
                                 </div>
                                 <div className="text-right">
                                     <span className="block text-lg font-bold text-primary">${deal.price}</span>
-                                    <span className="text-[10px] text-muted-foreground line-through">${deal.originalPrice}</span>
+                                    <span className="text-[10px] text-gray-400 line-through">${deal.originalPrice}</span>
                                 </div>
-                            </motion.div>
+                            </div>
                         ))}
                     </div>
                 </div>

@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>People Chat Conversation</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#13a4ec",
+                        "background-light": "#f6f7f8",
+                        "background-dark": "#101c22",
+                        "surface-dark": "#1e2930",
+                        "surface-input": "#283339",
+                    },
+                    fontFamily: {
+                        "display": ["Plus Jakarta Sans", "sans-serif"]
+                    },
+                    borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "2xl": "1rem", "full": "9999px" },
+                },
+            },
+        }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body>
+<div class="relative flex h-full min-h-screen w-full flex-col bg-background-light dark:bg-background-dark group/design-root overflow-hidden font-display text-slate-900 dark:text-white">
+<!-- Header -->
+<header class="flex items-center justify-between px-4 py-3 bg-background-light dark:bg-background-dark border-b border-gray-200 dark:border-gray-800 z-10">
+<div class="flex items-center gap-3">
+<button class="flex items-center justify-center text-slate-500 dark:text-slate-400 hover:text-primary transition-colors">
+<span class="material-symbols-outlined" style="font-size: 24px;">arrow_back_ios_new</span>
+</button>
+<div class="relative">
+<div class="w-10 h-10 rounded-full bg-cover bg-center border border-gray-200 dark:border-gray-700" data-alt="Portrait of Sarah Jenkins" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuAwmODmC_I1BOj240IKWRxzhqwcAD2c5Fgyeu2CnDsEuHttYQcOwd0hIksZ4jPU3IHg-bIiH_GaHcxn-gsAHnkyUr6CiLV63uieCWGyZkPkCCGLhIak1hOUaZX8LPcTzKJq4ADGEV5oXjgvZX2b6ZOnWys_sP5NcYurYVqm_xmrETUwNTD8E9pDQpL4fOBPKTBQMmvi5aHQuSJAGko7fq89Ut0iQbYBiHUUyjfWyORf1wS5AQvPMeUUg2Qp8eTTrpyddsJf6pR_a_kS");'>
+</div>
+<div class="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white dark:border-background-dark rounded-full"></div>
+</div>
+<div class="flex flex-col">
+<h2 class="text-base font-bold leading-tight tracking-tight">Sarah Jenkins</h2>
+<span class="text-xs text-slate-500 dark:text-[#9db0b9]">Active now</span>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="flex items-center justify-center text-slate-500 dark:text-slate-400 hover:text-primary transition-colors">
+<span class="material-symbols-outlined" style="font-size: 24px;">videocam</span>
+</button>
+<button class="flex items-center justify-center text-slate-500 dark:text-slate-400 hover:text-primary transition-colors">
+<span class="material-symbols-outlined" style="font-size: 24px;">info</span>
+</button>
+</div>
+</header>
+<!-- Chat Area -->
+<main class="flex-1 overflow-y-auto px-4 py-2 scroll-smooth">
+<!-- Date Separator -->
+<div class="flex justify-center py-4">
+<span class="text-xs font-medium text-slate-400 dark:text-[#9db0b9] bg-gray-100 dark:bg-surface-input/50 px-3 py-1 rounded-full">Today</span>
+</div>
+<!-- Incoming Message -->
+<div class="flex items-end gap-3 mb-4">
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full w-8 h-8 shrink-0" data-alt="Portrait of Sarah Jenkins" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuApsabQ6XUjGkvxooZ0BDWIk9J79kBt2Ljg9bflWi7Iiu0MZabxkeZ2SGk5FULtXR0isYTJhziSP5bN9nbX6uJ-kdKL8RS2mYEj0JpqchgmaVT6fgvNHj1i9YIXffp5gU4Y0VHw2Q_7fsaiC4Zo38SborHmn4afINjbS05Lk0uxeXlB2I68nHyQq0I48jHYIFsP2bv9k_WWm1jNR3k0gdicT5_s6oztl3DaCHU12-CQ7Y5TGK6DFmPF1PbnGKQdS2TEYUq9b5PirKz6");'></div>
+<div class="flex flex-col gap-1 items-start max-w-[75%]">
+<div class="px-4 py-3 bg-white dark:bg-surface-input rounded-2xl rounded-bl-sm shadow-sm dark:shadow-none">
+<p class="text-[15px] font-normal leading-relaxed text-slate-800 dark:text-white">Hey! Are we still on for the meeting later?</p>
+</div>
+<span class="text-[11px] text-slate-400 dark:text-slate-500 ml-1">10:30 AM</span>
+</div>
+</div>
+<!-- Outgoing Message -->
+<div class="flex items-end gap-3 mb-4 justify-end">
+<div class="flex flex-col gap-1 items-end max-w-[75%]">
+<div class="px-4 py-3 bg-primary rounded-2xl rounded-br-sm shadow-sm dark:shadow-none">
+<p class="text-[15px] font-normal leading-relaxed text-white">Yes, definitely. I'm just finishing up the slides.</p>
+</div>
+<div class="flex items-center gap-1 mr-1">
+<span class="text-[11px] text-slate-400 dark:text-slate-500">10:32 AM</span>
+<span class="material-symbols-outlined text-primary text-[14px]">done_all</span>
+</div>
+</div>
+</div>
+<!-- Incoming Message -->
+<div class="flex items-end gap-3 mb-4">
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full w-8 h-8 shrink-0" data-alt="Portrait of Sarah Jenkins" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuAZnGV7hfn9xsEPL_QRnn0gPV17VkoQaf8VCIBfqTCz7DUBZzjMVQY840ZscAnTwYNuwixXK60Dur-t85MLjyvEaQiQjrs9ovNFLT7GJsI1CS_xDn3TlVgWm3gqqWXHZlamrFKyCKQ3YII2tc9FMEMOMW_BGF7ppx39k90_2BINi7CeGe5FyfLenSiU0xEEFUqAHydlovHcG-UGVL1BPHebwkPeIB_yMogXCLf6gdXRn69AyqqnpxurhHfs-3zr60-U0jq9pUkQ8oJi");'></div>
+<div class="flex flex-col gap-1 items-start max-w-[75%]">
+<div class="px-4 py-3 bg-white dark:bg-surface-input rounded-2xl rounded-bl-sm shadow-sm dark:shadow-none">
+<p class="text-[15px] font-normal leading-relaxed text-slate-800 dark:text-white">Great. Send them over when you're done.</p>
+</div>
+<span class="text-[11px] text-slate-400 dark:text-slate-500 ml-1">10:33 AM</span>
+</div>
+</div>
+<!-- Outgoing Message -->
+<div class="flex items-end gap-3 mb-4 justify-end">
+<div class="flex flex-col gap-1 items-end max-w-[75%]">
+<div class="px-4 py-3 bg-primary rounded-2xl rounded-br-sm shadow-sm dark:shadow-none">
+<p class="text-[15px] font-normal leading-relaxed text-white">Will do!</p>
+</div>
+<div class="flex items-center gap-1 mr-1">
+<span class="text-[11px] text-slate-400 dark:text-slate-500">10:33 AM</span>
+<span class="material-symbols-outlined text-slate-500 dark:text-slate-600 text-[14px]">check</span>
+</div>
+</div>
+</div>
+<!-- Spacer for visibility behind sticky input -->
+<div class="h-4"></div>
+</main>
+<!-- Input Area -->
+<div class="bg-background-light dark:bg-background-dark border-t border-gray-200 dark:border-gray-800 p-2 pb-4">
+<div class="flex items-end gap-2 p-2">
+<button class="flex items-center justify-center w-10 h-10 text-slate-500 dark:text-slate-400 hover:bg-gray-200 dark:hover:bg-surface-input rounded-full transition-colors shrink-0">
+<span class="material-symbols-outlined font-light text-2xl">add</span>
+</button>
+<div class="flex-1 bg-white dark:bg-surface-input rounded-3xl flex items-center min-h-[44px] px-4 border border-gray-200 dark:border-transparent">
+<input class="bg-transparent border-none outline-none text-sm w-full text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 h-10 focus:ring-0 p-0" placeholder="Message..." type="text"/>
+<button class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors ml-2">
+<span class="material-symbols-outlined text-xl">mood</span>
+</button>
+</div>
+<button class="flex items-center justify-center w-10 h-10 bg-primary hover:bg-sky-600 rounded-full text-white shadow-md hover:shadow-lg transition-all shrink-0">
+<span class="material-symbols-outlined text-[20px] ml-0.5">send</span>
+</button>
+</div>
+</div>
+<!-- Bottom Navigation -->
+<nav class="bg-background-light dark:bg-background-dark border-t border-gray-200 dark:border-gray-800 pt-2 pb-6 px-6">
+<div class="flex items-center justify-between">
+<!-- Home Tab -->
+<button class="flex flex-col items-center gap-1 text-slate-500 dark:text-slate-400 hover:text-primary dark:hover:text-primary transition-colors group w-16">
+<span class="material-symbols-outlined group-hover:scale-110 transition-transform">home</span>
+<span class="text-[10px] font-medium">Home</span>
+</button>
+<!-- People Tab (Active) -->
+<button class="flex flex-col items-center gap-1 text-primary w-16 relative">
+<span class="material-symbols-outlined filled" style="font-variation-settings: 'FILL' 1;">group</span>
+<span class="text-[10px] font-bold">People</span>
+<div class="absolute -top-3 w-8 h-1 bg-primary/20 rounded-b-full"></div>
+</button>
+<!-- AI Tab -->
+<button class="flex flex-col items-center gap-1 text-slate-500 dark:text-slate-400 hover:text-primary dark:hover:text-primary transition-colors group w-16">
+<span class="material-symbols-outlined group-hover:scale-110 transition-transform">smart_toy</span>
+<span class="text-[10px] font-medium">AI</span>
+</button>
+<!-- Settings Tab -->
+<button class="flex flex-col items-center gap-1 text-slate-500 dark:text-slate-400 hover:text-primary dark:hover:text-primary transition-colors group w-16">
+<span class="material-symbols-outlined group-hover:scale-110 transition-transform">settings</span>
+<span class="text-[10px] font-medium">Settings</span>
+</button>
+</div>
+</nav>
+</div>
+</body></html>
