@@ -138,9 +138,22 @@ export default function ChatRoomPage() {
         }
     }, [messages, isAtBottom, room.id]);
 
+
+    // ✅ 스트리밍 중인 메시지들을 임시로 담아두는 상태
+    const [streamingMessages, setStreamingMessages] = useState<Record<string, any>>({});
+
     // ✅ Real-time Hook 사용 (Clean & Professional)
     usePusherChannel(`room-${room.id}`, {
         "new-message": (data: any) => {
+            // 스트리밍 후 실제 메시지가 오면 스트리밍 상태 제거
+            if (data.streamingId) {
+                setStreamingMessages(prev => {
+                    const next = { ...prev };
+                    delete next[data.streamingId];
+                    return next;
+                });
+            }
+
             setMessages((prev) => {
                 // 중복 방지
                 if (prev.find(m => m.id === data.id)) return prev;
@@ -161,14 +174,25 @@ export default function ChatRoomPage() {
                     markAsRead();
                 }
 
-                if (!isAtBottom) {
-                    setHasNewMessage(true);
-                    hapticSuccess(); // 📩 새 메시지 수신 진동
-                    return [...prev, data];
-                }
                 hapticSuccess(); // 📩 새 메시지 수신 진동
                 return [...prev, data];
             });
+        },
+        "ai-streaming": (data: any) => {
+            // 스트리밍 데이터 수신
+            setStreamingMessages(prev => ({
+                ...prev,
+                [data.id]: {
+                    ...data,
+                    createdAt: new Date().toISOString(),
+                    type: "TEXT"
+                }
+            }));
+
+            // 스트리밍 중일 때 바닥이면 계속 스크롤 유지
+            if (isAtBottom) {
+                setTimeout(() => scrollToBottom(), 50);
+            }
         },
         "user-typing": (data: { userId: string; isTyping: boolean }) => {
             if (String(data.userId) === String(user.id)) return;
@@ -311,7 +335,7 @@ export default function ChatRoomPage() {
                         <div className="w-10 h-10 rounded-full bg-cover bg-center border border-gray-200 dark:border-gray-700 overflow-hidden">
                             {partner?.image || partner?.avatarUrl ? (
                                 <img
-                                    src={partner.image || partner.avatarUrl}
+                                    src={partner.image ?? partner.avatarUrl ?? undefined}
                                     alt={partner.name || "User"}
                                     className="w-full h-full object-cover"
                                 />
@@ -356,33 +380,66 @@ export default function ChatRoomPage() {
                     </div>
                 )}
 
+                {/* Existing Messages */}
                 {messages.map((msg, index) => {
                     const prevMsg = messages[index - 1];
                     const showDateSeparator = !prevMsg || !isSameDay(prevMsg.createdAt, msg.createdAt);
-                    // 연속된 메시지인지 판단 (보낸사람 같음 + 날짜구분선 없음)
-                    const isChain = !!prevMsg && prevMsg.senderId === msg.senderId && !showDateSeparator;
+
+                    // '---' 구분자로 메시지 분할 처리 (공백/줄바꿈/탭 등 모든 공백 유연하게)
+                    const parts = msg.content.split(/\s*---\s*/).map(p => p.trim()).filter(p => p !== "");
 
                     return (
                         <div key={msg.id}>
                             {showDateSeparator && (
                                 <DateSeparator date={msg.createdAt} />
                             )}
-                            <MessageBubble
-                                content={msg.content}
-                                isMe={msg.senderId === user.id}
-                                createdAt={msg.createdAt}
-                                senderName={msg.sender.name || undefined}
-                                senderImage={msg.sender.image || undefined}
-                                type={msg.type as any}
-                                isChain={isChain}
-                                read={(msg as any).read}
-                                isAi={isAiChat}
-                            />
+                            {parts.map((part, pIndex) => {
+                                // 이전 메시지 혹은 같은 뭉치 내 2번째부터는 체인 처리 (아바타 숨김)
+                                const isChain = (!!prevMsg && prevMsg.senderId === msg.senderId && !showDateSeparator && pIndex === 0) || pIndex > 0;
+
+                                return (
+                                    <MessageBubble
+                                        key={`${msg.id}-${pIndex}`}
+                                        content={part}
+                                        isMe={msg.senderId === user.id}
+                                        createdAt={msg.createdAt}
+                                        senderName={msg.sender?.name || undefined}
+                                        senderImage={msg.sender?.image || msg.sender?.avatarUrl || undefined}
+                                        type={msg.type as any}
+                                        isChain={isChain}
+                                        read={(msg as any).read}
+                                        isAi={isAiChat}
+                                    />
+                                );
+                            })}
                         </div>
                     );
                 })}
 
-                {/* Optimistic UI (Text Only for now) */}
+                {/* ✨ Streaming Messages (Split support) ✨ */}
+                {Object.values(streamingMessages).map((streamMsg) => {
+                    // 스트리밍 중에도 실시간으로 분할하여 여러 말풍선 생성 (모든 공백 유연하게 인식)
+                    const parts = streamMsg.content.split(/\s*---\s*/).map((p: string) => p.trim()).filter((p: string) => p !== "");
+
+                    return (
+                        <div key={streamMsg.id}>
+                            {parts.map((part: string, pIndex: number) => (
+                                <MessageBubble
+                                    key={`${streamMsg.id}-${pIndex}`}
+                                    content={part}
+                                    isMe={false}
+                                    createdAt={streamMsg.createdAt}
+                                    senderName={streamMsg.sender?.name}
+                                    senderImage={streamMsg.sender?.image}
+                                    type="TEXT"
+                                    status="sending"
+                                    isAi={isAiChat}
+                                    isChain={pIndex > 0} // 첫 번째 말풍선 이후로는 아바타 생략하여 깔끔하게 표시
+                                />
+                            ))}
+                        </div>
+                    );
+                })}
                 {fetcher.state === "submitting" && !fetcher.formData?.get("type") && fetcher.formData?.get("content") && (
                     <MessageBubble
                         content={fetcher.formData.get("content") as string}
