@@ -155,8 +155,18 @@ export default function ChatRoomPage() {
             }
 
             setMessages((prev) => {
-                // 중복 방지
+                // 1. ID 기반 중복 방지 (기본)
                 if (prev.find(m => m.id === data.id)) return prev;
+
+                // 2. [핵심] 낙관적 업데이트 중복 방지:
+                // 내가 보낸 메시지인데 내용이 동일한 경우 무시
+                const isMyMessage = data.senderId === user.id;
+                if (isMyMessage) {
+                    const lastMsg = prev[prev.length - 1];
+                    if (lastMsg && lastMsg.content === data.content) {
+                        return prev;
+                    }
+                }
 
                 // AI 답변이 오면 낙관적 타이핑 해제
                 if (data.senderId !== user.id) {
@@ -440,17 +450,21 @@ export default function ChatRoomPage() {
                         </div>
                     );
                 })}
-                {fetcher.state === "submitting" && !fetcher.formData?.get("type") && fetcher.formData?.get("content") && (
-                    <MessageBubble
-                        content={fetcher.formData.get("content") as string}
-                        isMe={true}
-                        createdAt={new Date()}
-                        senderName={user.name}
-                        senderImage={user.image || undefined}
-                        status="sending" // 전송 중 상태 표시
-                        read={false}
-                    />
-                )}
+                {/* 🛡️ 낙관적 업데이트 중복 방지: fetcher가 전송 중이더라도 이미 Pusher로 메시지를 받았다면 그리지 않음 */}
+                {fetcher.state === "submitting" &&
+                    !fetcher.formData?.get("type") &&
+                    fetcher.formData?.get("content") &&
+                    messages[messages.length - 1]?.content !== fetcher.formData.get("content") && (
+                        <MessageBubble
+                            content={fetcher.formData.get("content") as string}
+                            isMe={true}
+                            createdAt={new Date()}
+                            senderName={user.name}
+                            senderImage={user.image || undefined}
+                            status="sending" // 전송 중 상태 표시
+                            read={false}
+                        />
+                    )}
 
                 {/* ✨ Typing Indicator ✨ */}
                 <TypingIndicator
