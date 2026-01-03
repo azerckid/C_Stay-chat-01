@@ -258,20 +258,82 @@ export default function ChatRoomPage() {
         scrollToBottom(false);
     }, []);
 
-    const handleSend = (text: string) => {
+    const handleSend = async (text: string) => {
         const formData = new FormData();
         formData.append("content", text);
-        formData.append("roomId", room.id); // API에 roomId 전달 필수
-        fetcher.submit(formData, { method: "post", action: "/api/messages" });
+        formData.append("roomId", room.id);
 
-        // 🔥 전송 즉시 낙관적 타이핑 시작! (단, AI 채팅일 때만)
+        hapticLight(); // 👆 전송 버튼 햅틱
+        setTimeout(() => scrollToBottom(), 50);
+
         if (isAiChat) {
             setIsOptimisticTyping(true);
-        }
+            try {
+                const response = await fetch("/api/messages", {
+                    method: "post",
+                    body: formData,
+                });
 
-        // 전송 직후 스크롤 내리기 (낙관적 업데이트보다 빠르게 반응)
-        setTimeout(() => scrollToBottom(), 50);
-        hapticLight(); // 👆 전송 버튼 햅틱
+                if (!response.ok) throw new Error("Send failed");
+
+                // SSE 스트림 읽기 시작
+                const reader = response.body?.getReader();
+                if (!reader) return;
+
+                const decoder = new TextDecoder();
+                let buffer = "";
+                let currentStreamingId = "";
+
+                while (true) {
+                    const { done, value } = await reader.read();
+                    if (done) break;
+
+                    buffer += decoder.decode(value, { stream: true });
+                    const lines = buffer.split("\n\n");
+                    buffer = lines.pop() || "";
+
+                    for (const line of lines) {
+                        const trimmedLine = line.trim();
+                        if (!trimmedLine.startsWith("data: ")) continue;
+
+                        try {
+                            const data = JSON.parse(trimmedLine.substring(6));
+
+                            if (data.id && !currentStreamingId) {
+                                currentStreamingId = data.id;
+                            }
+
+                            if (data.done) {
+                                setIsOptimisticTyping(false);
+                                // 실제 메시지로 전환될 때까지 약간 대기하거나 revalidator 사용
+                                setTimeout(() => revalidator.revalidate(), 500);
+                            } else if (data.content && currentStreamingId) {
+                                setStreamingMessages(prev => ({
+                                    ...prev,
+                                    [currentStreamingId]: {
+                                        id: currentStreamingId,
+                                        content: data.content,
+                                        senderId: data.senderId || prev[currentStreamingId]?.senderId,
+                                        sender: data.sender || prev[currentStreamingId]?.sender,
+                                        createdAt: new Date().toISOString()
+                                    }
+                                }));
+                                // 타이핑 상태 해제 (응답이 오기 시작했으므로)
+                                setIsOptimisticTyping(false);
+                            }
+                        } catch (e) {
+                            console.error("Parse Error:", e);
+                        }
+                    }
+                }
+            } catch (error) {
+                console.error("AI Send Error:", error);
+                setIsOptimisticTyping(false);
+            }
+        } else {
+            // 일반 채팅은 기존처럼 fetcher.submit 사용
+            fetcher.submit(formData, { method: "post", action: "/api/messages" });
+        }
     };
 
     // 타이핑 이벤트 전송 (api.typing.ts 호출)
