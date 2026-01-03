@@ -4,6 +4,11 @@ import { prisma } from "~/lib/db.server";
 import { pusherServer } from "~/lib/pusher.server";
 import { getAgentByEmail, AI_AGENTS } from "~/lib/ai-agents";
 
+// [Vercel Optimization] 서울/도쿄 리전으로 강제 고정하여 지연 시간 최소화
+export const config = {
+    regions: ["icn1", "hnd1"]
+};
+
 export async function action({ request }: ActionFunctionArgs) {
     const session = await getSession(request);
     const user = requireAuth(session, request);
@@ -18,7 +23,7 @@ export async function action({ request }: ActionFunctionArgs) {
     }
 
     try {
-        // 1. 유저 메시지 저장
+        // 1. 유저 메시지 저장 및 즉시 반환 (속도 최우선)
         const userMessage = await prisma.message.create({
             data: {
                 roomId,
@@ -29,19 +34,17 @@ export async function action({ request }: ActionFunctionArgs) {
                 conversationId: roomId
             },
             include: {
-                sender: {
-                    select: { id: true, name: true, image: true, avatarUrl: true }
-                }
+                sender: { select: { id: true, name: true, image: true, avatarUrl: true } }
             }
         });
 
-        // 2. Pusher 전송
-        await pusherServer.trigger(`room-${roomId}`, "new-message", {
+        // 2. Pusher 비동기 전송
+        pusherServer.trigger(`room-${roomId}`, "new-message", {
             ...userMessage,
             createdAt: userMessage.createdAt.toISOString()
-        });
+        }).catch(e => console.error("Pusher Error:", e));
 
-        // 3. AI 응답 처리 (백그라운드에서 실행)
+        // 3. AI 답변 트리거 (기다리지 않음)
         handleAIResponse(roomId, content, user.id).catch(err => {
             console.error("AI Response Error:", err);
         });
@@ -55,74 +58,55 @@ export async function action({ request }: ActionFunctionArgs) {
 
 async function handleAIResponse(roomId: string, userMessage: string, senderId: string) {
     try {
-        // 1. 방 정보 로드 및 해당 방에 속한 AI 멤버 찾기
+        // AI 답변을 위해 필요한 최소한의 정보만 로드
         const room = await prisma.room.findUnique({
             where: { id: roomId },
-            include: { members: { include: { user: true } } }
+            select: {
+                members: {
+                    select: { user: { select: { id: true, name: true, email: true, avatarUrl: true, image: true } } }
+                }
+            }
         });
         if (!room) return;
 
-        // [@staync.com] 도메인을 가진 진짜 AI 멤버를 찾습니다.
         const aiMember = room.members.find(m => m.user.email.endsWith("@staync.com"));
-
-        // 방에 AI 멤버가 없다면 일반 대화방이므로 답변하지 않고 종료합니다.
-        if (!aiMember || !aiMember.user) {
-            console.log(`[AI Guard] No AI agent found in room ${roomId}. Skipping response.`);
-            return;
-        }
+        if (!aiMember) return;
 
         const aiUser = aiMember.user;
         const agent = getAgentByEmail(aiUser.email);
-
-        // 자기가 보낸 메시지에는 응답하지 않음 (무한 루프 방지)
         if (senderId === aiUser.id) return;
 
-        console.log(`[AI Logic] ${agent.name} is responding in room ${roomId}...`);
-
-        // 2. Typing Indicator ON
+        // Typing Indicator 즉시 전송
         await pusherServer.trigger(`room-${roomId}`, "user-typing", {
             userId: aiUser.id,
             userName: aiUser.name || agent.name,
             isTyping: true
         });
 
+        // 대화 내역 로드 (필요한 필드만 선택해서 속도 향상)
         const history = await prisma.message.findMany({
             where: { roomId: roomId },
             orderBy: { createdAt: "desc" },
-            take: 15,
-            include: { sender: true }
+            take: 10, // 히스토리 개수를 약간 줄여서 쿼리 속도 향상
+            select: { content: true, senderId: true }
         });
         const sortedHistory = history.reverse();
 
+        // 시스템 지침 구성
         const otherAgentsInfo = AI_AGENTS
             .filter((a: any) => a.id !== agent.id)
             .map((a: any) => `- ${a.countryCode} Expert: ${a.name} (Specialties: ${a.specialties.join(", ")})`)
             .join("\n");
 
         const bubbleSplitRule = `[TECHNICAL PROTOCOL: UI_MESSAGE_STREAMING & EXPERTISE_GUARDRAIL]
-You are part of a multi-bubble chat system. Your output is parsed by a STACK of bubbles. 
-
-[STRICT EXPERTISE GUARDRAIL]
-- Your domain is the ENTIRE country of ${agent.countryCode}.
-- USE YOUR INTERNAL KNOWLEDGE: Before responding, determine if the user's query pertains to a location or topic within ${agent.countryCode}. If it does, you ARE the expert and you MUST provide a full, detailed response.
-- DO NOT be restricted by the 'Specialties' list.
-- REDIRECT ONLY IF: The query is explicitly about a DIFFERENT country:
+[TERRITORY] Your domain is the ENTIRE country of ${agent.countryCode}.
+[LANGUAGE] You MUST reply in the EXACT SAME LANGUAGE as the user (e.g., KOREAN).
+[BUBBLES] Use "---" after the 1st sentence and major sections. Keep each bubble short.
+[REDIRECTIONS] Only redirect if strictly about another country:
 ${otherAgentsInfo}
 
-[LANGUAGE ENFORCEMENT]
-- You MUST reply in the EXACT SAME LANGUAGE as the user's message (e.g., Korean for Korean users).
-- No other languages unless the user does.
-
-[STRICT BUBBLE RULE]
-- Divide your response with "---" after the intro and between major sections.
-- Keep each bubble under 3 sentences.
-
-[Agent Persona]
-${agent.persona}
-
+[PERSONA] ${agent.persona}
 Start with a brief intro in User's Language, then "---".`;
-
-        const systemInstructionContent = [bubbleSplitRule, `CRITICAL: 1. Use the KOREAN language if the user is using Korean. 2. Use "---" after the first sentence and every 2-3 sentences. 3. Your territory is strictly ${agent.countryCode}.`].join("\n\n");
 
         const contents = sortedHistory.map(msg => ({
             role: (msg.senderId === aiUser.id ? "model" : "user") as "model" | "user",
@@ -130,8 +114,6 @@ Start with a brief intro in User's Language, then "---".`;
         }));
 
         const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
-        if (!GEMINI_API_KEY) throw new Error("GEMINI_API_KEY is missing");
-
         const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:streamGenerateContent?alt=sse&key=${GEMINI_API_KEY}`;
 
         const response = await fetch(geminiUrl, {
@@ -139,12 +121,12 @@ Start with a brief intro in User's Language, then "---".`;
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
                 contents,
-                systemInstruction: { parts: [{ text: systemInstructionContent }] },
-                generationConfig: { temperature: 0.8, maxOutputTokens: 2048 }
+                systemInstruction: { parts: [{ text: bubbleSplitRule + `\nCRITICAL: Answer in user's language. Territory: ${agent.countryCode}.` }] },
+                generationConfig: { temperature: 0.8, maxOutputTokens: 1024 }
             })
         });
 
-        if (!response.ok) throw new Error(`Gemini API Error: ${response.status}`);
+        if (!response.ok) return;
 
         const reader = response.body?.getReader();
         const decoder = new TextDecoder();
@@ -153,10 +135,8 @@ Start with a brief intro in User's Language, then "---".`;
 
         if (!reader) return;
 
-        await pusherServer.trigger(`room-${roomId}`, "user-typing", {
-            userId: aiUser.id,
-            isTyping: false
-        });
+        // 타이핑 중지
+        await pusherServer.trigger(`room-${roomId}`, "user-typing", { userId: aiUser.id, isTyping: false });
 
         let buffer = "";
         while (true) {
@@ -176,38 +156,32 @@ Start with a brief intro in User's Language, then "---".`;
                     const textChunk = data.candidates?.[0]?.content?.parts?.[0]?.text || "";
 
                     if (textChunk) {
-                        const chars = textChunk.split("");
-                        for (const char of chars) {
-                            fullContent += char;
-                            await pusherServer.trigger(`room-${roomId}`, "ai-streaming", {
-                                id: streamingId,
-                                content: fullContent,
-                                senderId: aiUser.id,
-                                sender: { name: aiUser.name, image: aiUser.avatarUrl || aiUser.image } // 프로필 이미지 호환성
-                            });
-                            if (chars.length > 1) await new Promise(r => setTimeout(r, 10));
-                        }
+                        fullContent += textChunk;
+                        // 딜레이 없이 즉시 전송하여 네트워크 지연 상쇄
+                        await pusherServer.trigger(`room-${roomId}`, "ai-streaming", {
+                            id: streamingId,
+                            content: fullContent,
+                            senderId: aiUser.id,
+                            sender: { name: aiUser.name, image: aiUser.avatarUrl || aiUser.image }
+                        });
                     }
                 } catch (e) { }
             }
         }
 
-        await prisma.message.create({
+        // 답변 최종 저장 (비동기로 처리해서 유저 대기 시간 없음)
+        prisma.message.create({
             data: {
                 roomId,
                 senderId: aiUser.id,
                 content: fullContent,
-                type: "TEXT",
                 role: "assistant",
                 conversationId: roomId
             }
-        });
+        }).catch(e => console.error("Final Save Error:", e));
 
     } catch (error) {
         console.error("[AI Logic Error]:", error);
-        await pusherServer.trigger(`room-${roomId}`, "user-typing", {
-            userId: senderId,
-            isTyping: false
-        }).catch(() => { });
+        pusherServer.trigger(`room-${roomId}`, "user-typing", { userId: senderId, isTyping: false }).catch(() => { });
     }
 }
