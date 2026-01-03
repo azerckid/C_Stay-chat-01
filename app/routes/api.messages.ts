@@ -55,24 +55,34 @@ export async function action({ request }: ActionFunctionArgs) {
 
 async function handleAIResponse(roomId: string, userMessage: string, senderId: string) {
     try {
-        const aiUser = await prisma.user.findFirst({
-            where: { email: { contains: "ai@staync.com" } }
-        });
-        if (!aiUser) return;
-
+        // 1. 방 정보 로드 및 해당 방에 속한 AI 멤버 찾기
         const room = await prisma.room.findUnique({
             where: { id: roomId },
             include: { members: { include: { user: true } } }
         });
         if (!room) return;
 
-        const partner = room.members.find(m => m.userId !== aiUser.id)?.user;
-        const agent = partner ? getAgentByEmail(partner.email) : getAgentByEmail("ai@staync.com");
+        // [@staync.com] 도메인을 가진 진짜 AI 멤버를 찾습니다.
+        const aiMember = room.members.find(m => m.user.email.endsWith("@staync.com"));
+
+        // 방에 AI 멤버가 없다면 일반 대화방이므로 답변하지 않고 종료합니다.
+        if (!aiMember || !aiMember.user) {
+            console.log(`[AI Guard] No AI agent found in room ${roomId}. Skipping response.`);
+            return;
+        }
+
+        const aiUser = aiMember.user;
+        const agent = getAgentByEmail(aiUser.email);
+
+        // 자기가 보낸 메시지에는 응답하지 않음 (무한 루프 방지)
+        if (senderId === aiUser.id) return;
+
+        console.log(`[AI Logic] ${agent.name} is responding in room ${roomId}...`);
 
         // 2. Typing Indicator ON
         await pusherServer.trigger(`room-${roomId}`, "user-typing", {
             userId: aiUser.id,
-            userName: aiUser.name || "AI Concierge",
+            userName: aiUser.name || agent.name,
             isTyping: true
         });
 
@@ -112,7 +122,7 @@ ${agent.persona}
 
 Start with a brief intro in User's Language, then "---".`;
 
-        const systemInstructionContent = [bubbleSplitRule, `CRITICAL: 1. Use the USER's language (KOREAN if they use Korean). 2. Use "---" after the first sentence and every 2-3 sentences. 3. Your territory is strictly ${agent.countryCode}.`].join("\n\n");
+        const systemInstructionContent = [bubbleSplitRule, `CRITICAL: 1. Use the KOREAN language if the user is using Korean. 2. Use "---" after the first sentence and every 2-3 sentences. 3. Your territory is strictly ${agent.countryCode}.`].join("\n\n");
 
         const contents = sortedHistory.map(msg => ({
             role: (msg.senderId === aiUser.id ? "model" : "user") as "model" | "user",
@@ -173,7 +183,7 @@ Start with a brief intro in User's Language, then "---".`;
                                 id: streamingId,
                                 content: fullContent,
                                 senderId: aiUser.id,
-                                sender: { name: aiUser.name, image: aiUser.avatarUrl }
+                                sender: { name: aiUser.name, image: aiUser.avatarUrl || aiUser.image } // 프로필 이미지 호환성
                             });
                             if (chars.length > 1) await new Promise(r => setTimeout(r, 10));
                         }
