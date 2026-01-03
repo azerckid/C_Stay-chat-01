@@ -13,7 +13,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
     const user = requireAuth(session, request);
 
     // 1. 내 채팅방 목록
-    const rooms = await prisma.room.findMany({
+    const allRooms = await prisma.room.findMany({
         where: { members: { some: { userId: user.id } } },
         include: {
             members: { include: { user: true } },
@@ -22,16 +22,25 @@ export async function loader({ request }: LoaderFunctionArgs) {
         orderBy: { updatedAt: "desc" }
     });
 
-    // 2. 대화 가능한 유저 목록 (본인 제외)
-    // 실제 서비스에서는 친구 목록이어야 함
+    // AI가 포함된 방 필터링 (사람 대 사람 대화만 남김)
+    const humanRooms = allRooms.filter(room => {
+        return !room.members.some(m => m.user?.email?.toLowerCase().endsWith("@staync.com"));
+    });
+
+    // 2. 대화 가능한 유저 목록 (본인 + AI 제외)
     const otherUsers = await prisma.user.findMany({
-        where: { id: { not: user.id } },
+        where: {
+            id: { not: user.id },
+            NOT: {
+                email: { contains: "@staync.com" }
+            }
+        },
         select: { id: true, name: true, email: true, avatarUrl: true }
     });
 
     return {
         user,
-        rooms: rooms.map(room => {
+        rooms: humanRooms.map(room => {
             const otherMember = room.members.find(m => m.userId !== user.id)?.user;
             return {
                 id: room.id,
@@ -39,7 +48,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
                 image: otherMember?.image || otherMember?.avatarUrl,
                 lastMessage: room.messages[0]?.content || "대화를 시작해보세요.",
                 updatedAt: room.updatedAt.toISOString(),
-                unreadCount: 0 // 추후 구현
+                unreadCount: 0
             };
         }),
         potentialUsers: otherUsers
