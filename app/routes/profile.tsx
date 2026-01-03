@@ -1,8 +1,10 @@
+import { useState, useEffect } from "react";
 import { SafeArea, BottomNav } from "../components/layout";
 import { getSession, requireAuth } from "~/lib/auth.server";
 import { type LoaderFunctionArgs, useLoaderData } from "react-router";
 import { authClient } from "~/lib/auth-client";
 import { toast } from "sonner";
+import { useTheme } from "next-themes";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
     UserIcon,
@@ -22,6 +24,14 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
 export default function ProfilePage() {
     const { user } = useLoaderData<typeof loader>();
+    const { theme, setTheme } = useTheme();
+    const [mounted, setMounted] = useState(false);
+    const [notificationsEnabled, setNotificationsEnabled] = useState(true);
+
+    // hydration error 방지
+    useEffect(() => {
+        setMounted(true);
+    }, []);
 
     const handleLogout = async () => {
         toast.info("로그아웃 중입니다...");
@@ -132,8 +142,13 @@ export default function ProfilePage() {
                                 </div>
                                 <span className="text-sm font-medium text-[#111827] dark:text-[#F9FAFB]">Notifications</span>
                             </div>
-                            <div className="w-11 h-6 bg-[#EF4444] rounded-full relative cursor-pointer transition-colors shadow-inner">
-                                <div className="absolute right-1 top-1 w-4 h-4 bg-white rounded-full shadow-sm" />
+                            <div
+                                onClick={() => setNotificationsEnabled(!notificationsEnabled)}
+                                className={`w-11 h-6 rounded-full relative cursor-pointer transition-colors duration-200 outline-none ${notificationsEnabled ? "bg-[#EF4444]" : "bg-gray-200 dark:bg-gray-700"
+                                    }`}
+                            >
+                                <div className={`absolute top-1 w-4 h-4 bg-white rounded-full shadow-sm transition-transform duration-200 ${notificationsEnabled ? "translate-x-6" : "translate-x-1"
+                                    }`} />
                             </div>
                         </div>
 
@@ -145,9 +160,16 @@ export default function ProfilePage() {
                                 </div>
                                 <span className="text-sm font-medium text-[#111827] dark:text-[#F9FAFB]">Dark Mode</span>
                             </div>
-                            <div className="w-11 h-6 bg-gray-200 dark:bg-gray-700 rounded-full relative cursor-pointer transition-colors">
-                                <div className="absolute left-1 top-1 w-4 h-4 bg-white rounded-full shadow-sm" />
-                            </div>
+                            {mounted && (
+                                <div
+                                    onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+                                    className={`w-11 h-6 rounded-full relative cursor-pointer transition-colors duration-200 outline-none ${theme === "dark" ? "bg-primary" : "bg-gray-200 dark:bg-gray-700"
+                                        }`}
+                                >
+                                    <div className={`absolute top-1 w-4 h-4 bg-white rounded-full shadow-sm transition-transform duration-200 ${theme === "dark" ? "translate-x-6" : "translate-x-1"
+                                        }`} />
+                                </div>
+                            )}
                         </div>
                     </div>
                 </div>
