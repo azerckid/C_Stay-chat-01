@@ -4,9 +4,9 @@ import { prisma } from "~/lib/db.server";
 import { pusherServer } from "~/lib/pusher.server";
 import { getAgentByEmail, AI_AGENTS } from "~/lib/ai-agents";
 
-// [Vercel Optimization] 서울/도쿄 리전으로 강제 고정하여 지연 시간 최소화
+// [Vercel Optimization] 데이터베이스(Turso)와 동일한 도쿄 리전으로 고정하여 지연 시간 최소화 (무료 플랜은 단일 리전만 가능)
 export const config = {
-    regions: ["icn1", "hnd1"]
+    regions: ["hnd1"]
 };
 
 export async function action({ request }: ActionFunctionArgs) {
