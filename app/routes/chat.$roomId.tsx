@@ -299,7 +299,7 @@ export default function ChatRoomPage() {
                         try {
                             const data = JSON.parse(trimmedLine.substring(6));
 
-                            if (data.id && !currentStreamingId) {
+                            if (data.id) {
                                 currentStreamingId = data.id;
                             }
 

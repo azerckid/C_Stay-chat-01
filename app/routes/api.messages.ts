@@ -125,9 +125,11 @@ Start with a brief intro in User's Language, then "---".`;
                     const langstream = await model.stream(langchainMessages);
                     let fullContent = "";
 
-                    // 시작 신호
+                    // 스트리밍 시작 신호 및 Vercel 버퍼링 방지용 Preamble 전송
+                    controller.enqueue(encoder.encode(`: preamble\n${" ".repeat(2048)}\n\n`));
                     controller.enqueue(encoder.encode(`data: ${JSON.stringify({ id: streamingId, senderId: aiUser.id, sender: { name: aiUser.name, image: aiUser.avatarUrl || aiUser.image } })}\n\n`));
 
+                    // 1단계: AI 응답 전체 수집
                     for await (const chunk of langstream) {
                         let textChunk = "";
                         if (typeof chunk.content === "string") {
@@ -137,28 +139,50 @@ Start with a brief intro in User's Language, then "---".`;
                         } else {
                             textChunk = String(chunk.content || "");
                         }
+                        if (textChunk) fullContent += textChunk;
+                    }
 
-                        if (textChunk) {
-                            fullContent += textChunk;
-                            // 전체 내용 대신 변경분(delta)만 전송하여 실시간성 및 가독성 개선
-                            controller.enqueue(encoder.encode(`data: ${JSON.stringify({ content: textChunk })}\n\n`));
+                    // 2단계: '---' 구분자로 말풍선 분할
+                    const parts = fullContent.split(/\s*---\s*/).map(p => p.trim()).filter(p => p !== "");
+
+                    // 3단계: 각 말풍선을 한 글자씩 인위적인 딜레이와 함께 전송
+                    for (let i = 0; i < parts.length; i++) {
+                        const part = parts[i];
+                        const partId = `${streamingId}-${i}`; // 각 말풍선에 고유 ID 부여
+
+                        // 말풍선 시작 알림 (ID 교체)
+                        controller.enqueue(encoder.encode(`data: ${JSON.stringify({ id: partId, reset: true })}\n\n`));
+
+                        for (const char of part) {
+                            controller.enqueue(encoder.encode(`data: ${JSON.stringify({ content: char })}\n\n`));
+                            // 자연스러운 타이핑 효과를 위한 랜덤 딜레이 (30ms ~ 70ms)
+                            const delay = Math.floor(Math.random() * (70 - 30 + 1)) + 30;
+                            await new Promise(resolve => setTimeout(resolve, delay));
+                        }
+
+                        // 해당 파트 DB 저장
+                        await prisma.message.create({
+                            data: {
+                                roomId,
+                                senderId: aiUser.id,
+                                content: part,
+                                role: "assistant",
+                                conversationId: roomId
+                            }
+                        });
+
+                        // 파트 완료 신호
+                        controller.enqueue(encoder.encode(`data: ${JSON.stringify({ partDone: true })}\n\n`));
+
+                        // 다음 말풍선 전 약간의 휴식 (사람이 숨 고르는 듯한 효과)
+                        if (i < parts.length - 1) {
+                            await new Promise(resolve => setTimeout(resolve, 400));
                         }
                     }
 
                     // 완료 신호 및 타이핑 중지
                     controller.enqueue(encoder.encode(`data: ${JSON.stringify({ done: true })}\n\n`));
                     pusherServer.trigger(`room-${roomId}`, "user-typing", { userId: aiUser.id, isTyping: false }).catch(() => { });
-
-                    // 최종 결과 DB 저장 (비동기)
-                    prisma.message.create({
-                        data: {
-                            roomId,
-                            senderId: aiUser.id,
-                            content: fullContent,
-                            role: "assistant",
-                            conversationId: roomId
-                        }
-                    }).catch(e => console.error("Final Save Error:", e));
 
                     controller.close();
                 } catch (error) {
