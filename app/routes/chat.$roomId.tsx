@@ -238,9 +238,16 @@ export default function ChatRoomPage() {
         }
     });
 
-    // 메시지 추가 시 자동 스크롤 로직
+    // 메시지 추가 및 스트리밍 중 자동 스크롤 로직
     useEffect(() => {
         const lastMessage = messages[messages.length - 1];
+        const hasStreaming = Object.keys(streamingMessages).length > 0;
+
+        if (hasStreaming && isAtBottom) {
+            scrollToBottom();
+            return;
+        }
+
         if (!lastMessage) return;
 
         if (lastMessage.senderId === user.id) {
@@ -251,7 +258,7 @@ export default function ChatRoomPage() {
         if (isAtBottom) {
             scrollToBottom();
         }
-    }, [messages, user.id, isAtBottom]);
+    }, [messages, streamingMessages, user.id, isAtBottom]);
 
     // 페이지 최초 진입 시 스크롤 바닥으로
     useEffect(() => {
