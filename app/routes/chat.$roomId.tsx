@@ -308,16 +308,19 @@ export default function ChatRoomPage() {
                                 // 실제 메시지로 전환될 때까지 약간 대기하거나 revalidator 사용
                                 setTimeout(() => revalidator.revalidate(), 500);
                             } else if (data.content && currentStreamingId) {
-                                setStreamingMessages(prev => ({
-                                    ...prev,
-                                    [currentStreamingId]: {
-                                        id: currentStreamingId,
-                                        content: data.content,
-                                        senderId: data.senderId || prev[currentStreamingId]?.senderId,
-                                        sender: data.sender || prev[currentStreamingId]?.sender,
-                                        createdAt: new Date().toISOString()
-                                    }
-                                }));
+                                setStreamingMessages(prev => {
+                                    const existing = prev[currentStreamingId];
+                                    return {
+                                        ...prev,
+                                        [currentStreamingId]: {
+                                            id: currentStreamingId,
+                                            content: (existing?.content || "") + data.content,
+                                            senderId: data.senderId || existing?.senderId,
+                                            sender: data.sender || existing?.sender,
+                                            createdAt: existing?.createdAt || new Date().toISOString()
+                                        }
+                                    };
+                                });
                                 // 타이핑 상태 해제 (응답이 오기 시작했으므로)
                                 setIsOptimisticTyping(false);
                             }

@@ -129,10 +129,19 @@ Start with a brief intro in User's Language, then "---".`;
                     controller.enqueue(encoder.encode(`data: ${JSON.stringify({ id: streamingId, senderId: aiUser.id, sender: { name: aiUser.name, image: aiUser.avatarUrl || aiUser.image } })}\n\n`));
 
                     for await (const chunk of langstream) {
-                        const textChunk = chunk.content.toString();
+                        let textChunk = "";
+                        if (typeof chunk.content === "string") {
+                            textChunk = chunk.content;
+                        } else if (Array.isArray(chunk.content)) {
+                            textChunk = chunk.content.map(c => (typeof c === "string" ? c : (c as any).text || "")).join("");
+                        } else {
+                            textChunk = String(chunk.content || "");
+                        }
+
                         if (textChunk) {
                             fullContent += textChunk;
-                            controller.enqueue(encoder.encode(`data: ${JSON.stringify({ content: fullContent })}\n\n`));
+                            // 전체 내용 대신 변경분(delta)만 전송하여 실시간성 및 가독성 개선
+                            controller.enqueue(encoder.encode(`data: ${JSON.stringify({ content: textChunk })}\n\n`));
                         }
                     }
 
@@ -164,6 +173,8 @@ Start with a brief intro in User's Language, then "---".`;
                 "Content-Type": "text/event-stream",
                 "Cache-Control": "no-cache",
                 "Connection": "keep-alive",
+                "X-Content-Type-Options": "nosniff", // 브라우저 버퍼링 방지
+                "X-Accel-Buffering": "no",           // 서버 인프라(Nginx 등) 버퍼링 방지
             }
         });
 
